@@ -21,6 +21,9 @@ duration: 35min
 ---
 # Galois Field
 ---
+---
+# Hello!
+---
 src: ./pages/01-Galois人物介紹.md
 ---
 ---
