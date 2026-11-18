@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "id": "IRR-001",
+      "p": "2",
+      "polynomial": [
+        1,
+        1,
+        1
+      ],
+      "expected": true
+    },
+    {
+      "id": "IRR-002",
+      "p": "2",
+      "polynomial": [
+        1,
+        0,
+        1
+      ],
+      "expected": false
+    },
+    {
+      "id": "IRR-003",
+      "p": "3",
+      "polynomial": [
+        1,
+        0,
+        1
+      ],
+      "expected": true
+    }
+  ]
+}
