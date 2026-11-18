@@ -20,7 +20,6 @@ comark: true
 duration: 35min
 ---
 # Galois Field
----
 
 ---
 src: ./pages/01-Galois人物介紹.md
