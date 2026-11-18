@@ -1,7 +1,5 @@
 import { describe, test } from 'vitest'
-import { isIrreducible } from '../lib/galois/irreducible.js'
-import { Polynomial } from '../lib/galois/polynomial.js'
-import { PrimeField } from '../lib/galois/prime-field.js'
+import { isIrreducible, Polynomial, PrimeField } from '../lib/galois/index.js'
 import { observeCase } from './helpers/case-recorder.js'
 
 const suite = 'irreducible.test.ts'
@@ -62,5 +60,10 @@ describe('Polynomial irreducibility', () => {
       const actual = thrownName(() => isIrreducible(new Polynomial(field, coefficients)))
       record(id, 'invalid-modulus', { p: 3n, coefficients }, 'InvalidPolynomialError', actual, note)
     }
+  })
+
+  test('rejects a non-polynomial at the public API boundary', () => {
+    const actual = thrownName(() => isIrreducible(null as unknown as Polynomial))
+    record('IRR-ERR-INPUT-001', 'invalid-input', { value: null }, 'TypeError', actual, 'The package export rejects a non-Polynomial argument before reading degree or coefficients.')
   })
 })

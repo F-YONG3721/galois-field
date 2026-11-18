@@ -1,7 +1,5 @@
 import { describe, test } from 'vitest'
-import { extendedGcd, gcd } from '../lib/galois/euclidean.js'
-import { Polynomial } from '../lib/galois/polynomial.js'
-import { PrimeField } from '../lib/galois/prime-field.js'
+import { extendedGcd, gcd, Polynomial, PrimeField } from '../lib/galois/index.js'
 import { observeCase } from './helpers/case-recorder.js'
 
 const suite = 'euclidean.test.ts'
@@ -86,5 +84,15 @@ describe('Polynomial Euclidean algorithms', () => {
     const right = new Polynomial(new PrimeField(3n), [1n, 1n])
     const actual = thrownName(() => gcd(left, right))
     record('EUCLID-ERR-FIELD-001', 'gcd', { left: { p: 2n, coefficients: [1n, 1n] }, right: { p: 3n, coefficients: [1n, 1n] } }, 'IncompatibleFieldError', actual, 'Polynomial Euclidean algorithms require the same base characteristic.')
+  })
+
+  test('rejects non-polynomial operands at the public API boundary', () => {
+    const field = new PrimeField(2n)
+    const polynomial = new Polynomial(field, [1n, 1n])
+    const invalid = null as unknown as Polynomial
+    const gcdActual = thrownName(() => gcd(invalid, polynomial))
+    record('EUCLID-ERR-INPUT-001', 'gcd-invalid-input', { left: null, right: { p: 2n, coefficients: [1n, 1n] } }, 'TypeError', gcdActual, 'The package export rejects a non-Polynomial operand before Euclidean arithmetic.')
+    const extendedActual = thrownName(() => extendedGcd(polynomial, invalid))
+    record('EUCLID-ERR-INPUT-002', 'extended-gcd-invalid-input', { left: { p: 2n, coefficients: [1n, 1n] }, right: null }, 'TypeError', extendedActual, 'The package export applies the same operand validation to extended Euclid.')
   })
 })

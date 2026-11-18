@@ -1,5 +1,5 @@
 import { describe, test } from 'vitest'
-import { ExtensionField, Polynomial, PrimeField } from '../lib/galois/index.js'
+import { ExtensionField, Polynomial, PrimeField, TraceRecorder } from '../lib/galois/index.js'
 import { observeCase } from './helpers/case-recorder.js'
 
 const suite = 'integration.test.ts'
@@ -26,5 +26,18 @@ describe('Finite-field integration samples', () => {
     record('INT-GF8-FLOW-001', 'composed arithmetic', { value: [1n, 1n, 1n], operation: 'a^2+1' }, [0n, 1n, 0n], vec(transformed), 'Integration flow combines multiplication and addition in one settled field.')
     let mismatch = 'no error'; try { first.element([1n]).div(second.element([1n])) } catch (error) { mismatch = error instanceof Error ? error.name : typeof error }
     record('INT-CROSS-FIELD-DIV-001', 'mismatched division', { left: 'x^3+x+1', right: 'x^3+x^2+1' }, 'IncompatibleFieldError', mismatch, 'Values from different extension constructions cannot be divided.')
+  })
+
+  test('accepts equivalent extension definitions through the public API', () => {
+    const firstBase = new PrimeField(2n)
+    const secondBase = new PrimeField(2n)
+    const first = new ExtensionField(firstBase, new Polynomial(firstBase, [1n, 1n, 0n, 1n]))
+    const second = new ExtensionField(secondBase, new Polynomial(secondBase, [1n, 1n, 0n, 1n]))
+    const left = first.element([1n, 0n, 1n])
+    const right = second.element([1n, 1n, 0n])
+    const recorder = new TraceRecorder()
+    const actual = [...left.add(right, { trace: recorder.asSink() }).coefficients]
+    record('INT-EQUIVALENT-FIELD-001', 'equivalent-construction-add', { modulus: [1n, 1n, 0n, 1n], left: [1n, 0n, 1n], right: [1n, 1n, 0n] }, [0n, 1n, 1n], actual, 'Equivalent base/modulus definitions are compatible even when instantiated separately.')
+    record('INT-INDEX-TRACE-001', 'trace-recorder-export', { steps: recorder.steps.length }, 1, recorder.steps.length, 'TraceRecorder is reachable from the package public index.')
   })
 })

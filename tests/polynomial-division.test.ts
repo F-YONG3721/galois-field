@@ -1,7 +1,5 @@
 import { describe, test } from 'vitest'
-import { Polynomial } from '../lib/galois/polynomial.js'
-import { polynomialDivmod } from '../lib/galois/polynomial-division.js'
-import { PrimeField } from '../lib/galois/prime-field.js'
+import { Polynomial, PrimeField, polynomialDivmod } from '../lib/galois/index.js'
 import { observeCase } from './helpers/case-recorder.js'
 
 const suite = 'polynomial-division.test.ts'

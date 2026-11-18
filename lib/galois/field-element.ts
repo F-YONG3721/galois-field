@@ -136,7 +136,7 @@ export class FieldElement {
 
   equals(other: FieldElement): boolean {
     return other instanceof FieldElement
-      && this.field === other.field
+      && this.field.isSameConstruction(other.field)
       && this.coefficients.length === other.coefficients.length
       && this.coefficients.every((coefficient, index) => coefficient === other.coefficients[index])
   }
@@ -153,7 +153,7 @@ export class FieldElement {
     if (!(other instanceof FieldElement)) {
       throw new TypeError('Field operation requires another FieldElement')
     }
-    if (this.field !== other.field) {
+    if (!this.field.isSameConstruction(other.field)) {
       throw new IncompatibleFieldError('Field elements belong to different ExtensionField constructions')
     }
   }
