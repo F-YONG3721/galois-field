@@ -4,7 +4,7 @@
 
 | Phase | Task IDs | Parallel owners (max 3) | Dependencies | Acceptance | Status |
 |---|---|---|---|---|---|
-| P0 | SPEC-01, API-01, TEST-01 | coordinator | clean branch, docs | review math-spec, finalize API signatures, test plan; no core tests required | TODO |
+| P0 | SPEC-01, API-01, TEST-01 | coordinator | clean branch, docs | review math-spec, finalize API signatures, test plan; no core tests required | IN_PROGRESS |
 | P1 | PF-DEV, PF-TEST, TRACE-SCHEMA | prime-field-dev, prime-field-test, trace-dev | P0 | PrimeField tests + observation records PASS | TODO |
 | P2 | POLY-DEV, POLY-TEST, ALG-DEV, ALG-TEST | polynomial-dev, polynomial-test, algorithm-dev, algorithm-test | P1, division before Euclid and irreducibility | polynomial, polynomial-division, euclidean, irreducible tests PASS | TODO |
 | P3 | FIELD-DEV, FIELD-TEST, TRACE-TEST | finite-field-dev, finite-field-test, trace-test | P2 | extension-field, field-element, trace and property tests PASS | TODO |

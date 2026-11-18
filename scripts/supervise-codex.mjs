@@ -270,7 +270,7 @@ async function runSupervisor(repo) {
         const events=path.join(runDir,`${phase.id}-attempt${attempt}-events.jsonl`);
         const errors=path.join(runDir,`${phase.id}-attempt${attempt}-stderr.log`);
         const headBefore=git(repo,['rev-parse','HEAD']);
-        const task=await runChild(info.codexBin,[ 'exec','--json','--sandbox','workspace-write','--ask-for-approval','never', '-' ],{
+        const task=await runChild(info.codexBin,['exec', '--json', '--sandbox', 'workspace-write', '-c', 'approval_policy="never"', '-'],{
           repo,timeoutMs:Math.min(settings.taskMs,settings.totalMs-(Date.now()-started)),idleMs:settings.idleMs,
           logfile:events,stderrFile:errors,stdin:phasePrompt(phase,attempt,previousFailure),
           watch:()=>watchedState(repo,headBefore,frozenContracts),
