@@ -7,7 +7,7 @@
 | P0 | SPEC-01, API-01, TEST-01 | coordinator | clean branch, docs | review math-spec, finalize API signatures, test plan; no core tests required | DONE |
 | P1 | PF-DEV, PF-TEST, TRACE-SCHEMA | prime-field-dev, prime-field-test, trace-dev | P0 | PrimeField tests + observation records PASS | DONE |
 | P2 | POLY-DEV, POLY-TEST, ALG-DEV, ALG-TEST | polynomial-dev, polynomial-test, algorithm-dev, algorithm-test | P1, division before Euclid and irreducibility | polynomial, polynomial-division, euclidean, irreducible tests PASS | DONE |
-| P3 | FIELD-DEV, FIELD-TEST, TRACE-TEST | finite-field-dev, finite-field-test, trace-test | P2 | extension-field, field-element, trace and property tests PASS | TODO |
+| P3 | FIELD-DEV, FIELD-TEST, TRACE-TEST | finite-field-dev, finite-field-test, trace-test | P2 | extension-field, field-element, trace and property tests PASS | DONE |
 | P4 | INTEGRATE-01, REGRESSION-01 | coordinator + test agents | P3 | entire Vitest suite, observation reports and existing Slidev build PASS | TODO |
 
 ## Execution policy
