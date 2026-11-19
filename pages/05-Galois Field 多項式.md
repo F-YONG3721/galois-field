@@ -15,14 +15,35 @@ $$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$$
 
 ## $GF(2^n)$ 運算規則
 
+<div class="grid grid-cols-12 gap-6 items-center mt-2">
+<div class="col-span-5">
+
 ### 1. 加法與減法
-- 係數 $\bmod 2$ $\;\Longrightarrow\;$ 等同於二進位 **XOR ($\oplus$)**
-- 無進位，且**每個元素的加法反元素就是自己**
+- 係數 $\bmod 2$ $\;\Longrightarrow\;$ 等同 **XOR ($\oplus$)**
+- 無進位，且**加減法完全相同**
+- 每個元素的加法反元素就是自己
+
+</div>
+<div class="col-span-7 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm [&_th]:!py-1 [&_td]:!py-1">
+
+| $a$ | $b$ | $(a+b)\bmod 2$ | $(a-b)\bmod 2$ | $a \oplus b$ |
+|:---:|:---:|:---:|:---:|:---:|
+| 0 | 0 | <span class="text-emerald-400 font-bold">0</span> | <span class="text-emerald-400 font-bold">0</span> | <span class="text-emerald-400 font-bold">0</span> |
+| 0 | 1 | <span class="text-amber-400 font-bold">1</span> | <span class="text-amber-400 font-bold">1</span> | <span class="text-amber-400 font-bold">1</span> |
+| 1 | 0 | <span class="text-amber-400 font-bold">1</span> | <span class="text-amber-400 font-bold">1</span> | <span class="text-amber-400 font-bold">1</span> |
+| 1 | 1 | <span class="text-emerald-400 font-bold">0</span> | <span class="text-emerald-400 font-bold">0</span> | <span class="text-emerald-400 font-bold">0</span> |
+
+</div>
+</div>
+
+<div class="mt-4">
 
 ### 2. 乘法三步驟
 1. **多項式展開**：依一般分配律乘開
 2. **係數 $\bmod 2$**：偶數歸 `0`、奇數留 `1`（解決**係數 $> 1$**）
 3. **對 $n$ 次不可約多項式 $m(x)$ 取餘數**：將次方壓回 $< n$（解決**次方溢位**）
+
+</div>
 
 ---
 
