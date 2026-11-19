@@ -1,11 +1,11 @@
 # Galois Field calculator — supervised Codex development policy
 
 ## Priority and scope
-- P0–P4 cover the existing arithmetic core and its tests. When asked to execute UI-01, work on feature/build-calculator in an interactive Codex session and follow the UI task in agenda.md.
-- For UI-01, edit the user-provided pages/calculator.md and create or update components/GFCalculator.vue and components/GFOperationSteps.vue. Preserve the page’s existing frontmatter and user-provided content. Leave the arithmetic core, expected test values, other slides, dependency files, and deployment settings unchanged.
-- If slides.md already includes pages/calculator.md, use the existing reference. If the page is missing from the deck, add the minimum necessary reference only when the user explicitly authorizes editing slides.md.
-- The authoritative sources are `docs/math-spec.md`, `docs/api-contract.md`, `docs/test-plan.md`, and the phase/task list in `agenda.md`. Do not weaken or rewrite approved mathematical requirements to pass tests.
-- Work only on branch `feature/build-calculator`. Never check out another branch, cherry-pick, rebase, push, deploy, force-push, or amend history. The external supervisor alone creates local checkpoint commits.
+- P0–P4 cover the existing arithmetic core and its tests. When asked to execute `UI-01` or `UI-02`, work in an interactive Codex session and follow the corresponding task and acceptance criteria in `agenda.md`.
+- For `UI-01` and `UI-02`, edit the user-provided `pages/calculator.md` and create or update `components/GFCalculator.vue` and `components/GFOperationSteps.vue`. Preserve the page’s existing frontmatter and user-provided content. Reuse the existing arithmetic core. Preserve expected test values, other slides, dependency files, and deployment settings.
+- If `slides.md` already includes `pages/calculator.md`, reuse the existing reference. If the page is missing from the deck, add the minimum necessary reference only with explicit user authorization.
+- The authoritative sources are `docs/math-spec.md`, `docs/api-contract.md`, `docs/test-plan.md`, and the phase and task list in `agenda.md`. Do not weaken or rewrite approved mathematical requirements to pass tests.
+- Work only on branch `feature/build-calculator`. Never check out another branch, cherry-pick, rebase, push, deploy, force-push, or amend history. For P0–P4, the external supervisor alone creates local checkpoint commits.
 
 ## Shared file ownership
 - Coordinator owns planning and module interface decisions and coordinates agent dependencies. Never start a dependent worker before upstream contract is settled.
@@ -30,11 +30,15 @@
 - The external supervisor makes the final completion/abort decision. Its timeout/permissions/checkpoints cannot be overridden by agents.
 
 ## Subagent protocol
-1. Coordinator reads the contract and agenda and delegates independent tasks to the matching custom agent by name, honoring dependency order and concurrency <=3.
-2. Developer and testing agents must operate on disjoint files. Test agents review or execute the actual implementation but may not silently repair implementation.
-3. Coordinator runs focused tests, records actual output, reports remaining failures and returns the workspace to supervisor.
-4. When blocked, clearly say `BLOCKED: <cause>` and do not spawn replacement work to evade guardrails.
-5. Only mark a task DONE after independently observed tests and successful supervisor checkpoint.
+This protocol applies only to supervised runs for P0–P4.
+
+1. The coordinator reads the contract and agenda, then assigns independent tasks to the matching custom agents by name. Follow dependency order and run at most three agents concurrently.
+2. Developer and test agents work on disjoint files. Test agents review or test the implementation and report any defects to the coordinator.
+3. The coordinator runs focused tests, records the actual output, reports remaining failures, and returns control to the supervisor.
+4. If blocked, report `BLOCKED: <cause>` and stop assigning work for the blocked phase.
+5. Mark a task `DONE` only after independent test verification and a successful supervisor checkpoint.
+
+For `UI-01` and `UI-02`, work in an interactive Codex session and follow the corresponding acceptance criteria in `agenda.md`. Mark the task `DONE` once all required checks pass. Report any failed or unverified checks.
 
 ## Evidence/exit rules
 - A report needs input, expected, actual, result and concise interpretation per case, plus aggregate counts. No invented actual output.
