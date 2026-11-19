@@ -62,6 +62,27 @@ $$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$$
 
 ---
 
+## $GF(2^3)$ 多項式加法表（係數 $\bmod 2$ / XOR）
+
+> 主對角線全為 <span style="color:red">0</span>：任何多項式加上自己皆為 `0`，代表**每個元素的加法反元素就是自己**。
+
+<div class="text-base [&_th]:!py-2 [&_td]:!py-2 [&_th]:!px-2 [&_td]:!px-2 whitespace-nowrap">
+
+| $+$ | 0 | 1 | x | x+1 | x² | x²+1 | x²+x | x²+x+1 |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **0** | <span style="color:red">0</span> | 1 | x | x+1 | x² | x²+1 | x²+x | x²+x+1 |
+| **1** | 1 | <span style="color:red">0</span> | x+1 | x | x²+1 | x² | x²+x+1 | x²+x |
+| **x** | x | x+1 | <span style="color:red">0</span> | 1 | x²+x | x²+x+1 | x² | x²+1 |
+| **x+1** | x+1 | x | 1 | <span style="color:red">0</span> | x²+x+1 | x²+x | x²+1 | x² |
+| **x²** | x² | x²+1 | x²+x | x²+x+1 | <span style="color:red">0</span> | 1 | x | x+1 |
+| **x²+1** | x²+1 | x² | x²+x+1 | x²+x | 1 | <span style="color:red">0</span> | x+1 | x |
+| **x²+x** | x²+x | x²+x+1 | x² | x²+1 | x | x+1 | <span style="color:red">0</span> | 1 |
+| **x²+x+1** | x²+x+1 | x²+x | x²+1 | x² | x+1 | x | 1 | <span style="color:red">0</span> |
+
+</div>
+
+---
+
 ## $GF(2^3)$ 多項式乘法表（模 $x^3 + x^2 + 1$）
 
 > 非零元素每列皆有唯一的 <span style="color:red">1</span>（皆具乘法反元素）；右下角 **$(x^2+x+1)^2 = x$** 驗證上頁推導。
