@@ -1,8 +1,9 @@
 # Galois Field calculator — supervised Codex development policy
 
 ## Priority and scope
-- This repository is an existing Slidev presentation. Preserve `slides.md`, `pages/`, `snippets/`, `components/`, deployment settings, existing assets, and existing unrelated code.
-- The active assignment is **core arithmetic and independently verifiable tests**, not UI implementation or deployment.
+- P0–P4 cover the existing arithmetic core and its tests. When asked to execute UI-01, work on feature/build-calculator in an interactive Codex session and follow the UI task in agenda.md.
+- For UI-01, edit the user-provided pages/calculator.md and create or update components/GFCalculator.vue and components/GFOperationSteps.vue. Preserve the page’s existing frontmatter and user-provided content. Leave the arithmetic core, expected test values, other slides, dependency files, and deployment settings unchanged.
+- If slides.md already includes pages/calculator.md, use the existing reference. If the page is missing from the deck, add the minimum necessary reference only when the user explicitly authorizes editing slides.md.
 - The authoritative sources are `docs/math-spec.md`, `docs/api-contract.md`, `docs/test-plan.md`, and the phase/task list in `agenda.md`. Do not weaken or rewrite approved mathematical requirements to pass tests.
 - Work only on branch `feature/build-calculator`. Never check out another branch, cherry-pick, rebase, push, deploy, force-push, or amend history. The external supervisor alone creates local checkpoint commits.
 
