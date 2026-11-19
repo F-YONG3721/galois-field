@@ -62,20 +62,24 @@ $$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$$
 
 ---
 
-## $GF(2^3)$ 乘法表（模 $x^3 + x^2 + 1$）
+## $GF(2^3)$ 多項式乘法表（模 $x^3 + x^2 + 1$）
 
-> 非零元素每列皆有唯一的 <span style="color:red">1</span>（皆具乘法反元素）；右下角 **7 × 7 = 2** 驗證上頁推導。
+> 非零元素每列皆有唯一的 <span style="color:red">1</span>（皆具乘法反元素）；右下角 **$(x^2+x+1)^2 = x$** 驗證上頁推導。
 
-| $\times$ | `000` (0) | `001` (1) | `010` (2) | `011` (3) | `100` (4) | `101` (5) | `110` (6) | `111` (7) |
+<div class="text-xs [&_th]:!py-1 [&_td]:!py-1 [&_th]:!px-1.5 [&_td]:!px-1.5 whitespace-nowrap">
+
+| $\times$ | 0 | 1 | x | x+1 | x² | x²+1 | x²+x | x²+x+1 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **`000` (0)** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **`001` (1)** | 0 | <span style="color:red">1</span> | 2 | 3 | 4 | 5 | 6 | 7 |
-| **`010` (2)** | 0 | 2 | 4 | 6 | 5 | 7 | <span style="color:red">1</span> | 3 |
-| **`011` (3)** | 0 | 3 | 6 | 5 | <span style="color:red">1</span> | 2 | 7 | 4 |
-| **`100` (4)** | 0 | 4 | 5 | <span style="color:red">1</span> | 7 | 3 | 2 | 6 |
-| **`101` (5)** | 0 | 5 | 7 | 2 | 3 | 6 | 4 | <span style="color:red">1</span> |
-| **`110` (6)** | 0 | 6 | <span style="color:red">1</span> | 7 | 2 | 4 | 3 | 5 |
-| **`111` (7)** | 0 | 7 | 3 | 4 | 6 | <span style="color:red">1</span> | 5 | **2** |
+| **0** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+| **1** | 0 | <span style="color:red">1</span> | x | x+1 | x² | x²+1 | x²+x | x²+x+1 |
+| **x** | 0 | x | x² | x²+x | x²+1 | x²+x+1 | <span style="color:red">1</span> | x+1 |
+| **x+1** | 0 | x+1 | x²+x | x²+1 | <span style="color:red">1</span> | x | x²+x+1 | x² |
+| **x²** | 0 | x² | x²+1 | <span style="color:red">1</span> | x²+x+1 | x+1 | x | x²+x |
+| **x²+1** | 0 | x²+1 | x²+x+1 | x | x+1 | x²+x | x² | <span style="color:red">1</span> |
+| **x²+x** | 0 | x²+x | <span style="color:red">1</span> | x²+x+1 | x | x² | x+1 | x²+1 |
+| **x²+x+1** | 0 | x²+x+1 | x+1 | x² | x²+x | <span style="color:red">1</span> | x²+1 | **x** |
+
+</div>
 
 ---
 
