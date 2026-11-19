@@ -66,7 +66,7 @@ $$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$$
 
 > 非零元素每列皆有唯一的 <span style="color:red">1</span>（皆具乘法反元素）；右下角 **$(x^2+x+1)^2 = x$** 驗證上頁推導。
 
-<div class="text-xs [&_th]:!py-1 [&_td]:!py-1 [&_th]:!px-1.5 [&_td]:!px-1.5 whitespace-nowrap">
+<div class="text-base [&_th]:!py-2 [&_td]:!py-2 [&_th]:!px-2 [&_td]:!px-2 whitespace-nowrap">
 
 | $\times$ | 0 | 1 | x | x+1 | x² | x²+1 | x²+x | x²+x+1 |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
