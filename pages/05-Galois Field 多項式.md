@@ -1,15 +1,22 @@
 ## $GF(2^n)$ 與多項式基底
 
-在 $GF(2^n)$ 中，元素以 $x$ 的**多項式基底 (Polynomial Basis)** 表示：
+在 $GF(2^n)$ 中，因為 $2^n$ 是合數（偶數沒有乘法反元素），不能直接做整數 $\bmod 2^n$，而是改將元素表示為**多項式基底 (Polynomial Basis)**：
 
 $$A(x) = a_{n-1}x^{n-1} + a_{n-2}x^{n-2} + \dots + a_1x + a_0$$
 
 - **最高次方 $< n$**：剛好對應電腦中的 **$n$ 個 Bits**（第 $0$ 到第 $n-1$ 位元）
 - **係數 $a_i \in \{0, 1\}$**：建立在 $GF(2)$ 上，直接對應二進位位元
 
-**對應範例（$GF(2^8)$）：**
+**對應範例（$GF(2^8)$）：$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$**
 
-$$x^6 + x^4 + x + 1 \;\longleftrightarrow\; \texttt{01010011}$$
+<div class="mt-2 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm [&_th]:!py-1 [&_td]:!py-1">
+
+| 次方項 | $x^7$ | **$x^6$** | $x^5$ | **$x^4$** | $x^3$ | $x^2$ | **$x^1$** | **$x^0$** |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| **二進位 Bit** | `0` | <span class="text-emerald-400 font-bold">`1`</span> | `0` | <span class="text-emerald-400 font-bold">`1`</span> | `0` | `0` | <span class="text-emerald-400 font-bold">`1`</span> | <span class="text-emerald-400 font-bold">`1`</span> |
+| **對應多項式** | — | <span class="text-emerald-400 font-bold">$x^6$</span> | — | <span class="text-emerald-400 font-bold">$x^4$</span> | — | — | <span class="text-emerald-400 font-bold">$x$</span> | <span class="text-emerald-400 font-bold">$1$</span> |
+
+</div>
 
 ---
 
