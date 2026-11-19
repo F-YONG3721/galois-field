@@ -5,4 +5,6 @@ class: calculator-page
 
 # Interactive Galois Field Calculator
 
-<GFCalculator />
+<div style="max-height: 450px; overflow-y: auto;">
+    <GFCalculator />
+</div>
