@@ -1,0 +1,3766 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GF(pⁿ) 有限體互動運算與完整元素探索工具</title>
+  <style>
+    /* =========================================================================
+       設計系統與深色海軍藍主題 (Pure Vanilla CSS, Zero External Dependencies)
+       ========================================================================= */
+    :root {
+      --bg-base: #090d16;
+      --bg-card: #111827;
+      --bg-inset: #0b1120;
+      --bg-elevated: #182235;
+      --border: #1f2937;
+      --border-strong: #2e3c54;
+
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --cyan: #38bdf8;
+      --cyan-dim: rgba(56, 189, 248, 0.14);
+      --cyan-border: rgba(56, 189, 248, 0.36);
+
+      --indigo: #818cf8;
+      --indigo-dim: rgba(129, 140, 248, 0.14);
+      --indigo-border: rgba(129, 140, 248, 0.36);
+
+      --purple: #a855f7;
+      --purple-light: #c084fc;
+      --purple-dim: rgba(168, 85, 247, 0.14);
+      --purple-border: rgba(168, 85, 247, 0.38);
+
+      --emerald: #34d399;
+      --emerald-dim: rgba(52, 211, 153, 0.14);
+      --emerald-border: rgba(52, 211, 153, 0.36);
+
+      --amber: #fbbf24;
+      --amber-dim: rgba(251, 191, 36, 0.13);
+      --amber-border: rgba(251, 191, 36, 0.36);
+
+      --rose: #fb7185;
+      --rose-dim: rgba(251, 113, 133, 0.14);
+      --rose-border: rgba(251, 113, 133, 0.42);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+
+      --font-sans: "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      background-color: var(--bg-base);
+      background-image:
+        radial-gradient(ellipse 80% 45% at 50% -15%, rgba(56, 189, 248, 0.13), transparent),
+        radial-gradient(ellipse 60% 35% at 95% 100%, rgba(168, 85, 247, 0.08), transparent);
+      color: var(--text-primary);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* 捲軸樣式 */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0b1120; }
+    ::-webkit-scrollbar-thumb { background: #29364e; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #3b4f70; }
+
+    /* 移除數字輸入框預設上下箭頭 */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
+    }
+
+    .mono { font-family: var(--font-mono); }
+    .hidden { display: none !important; }
+    .poly-expr sup {
+      font-size: 0.72em;
+      line-height: 0;
+      vertical-align: super;
+      margin-left: 1px;
+    }
+
+    /* 頂部導覽列 */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: rgba(9, 13, 22, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 12px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.24), rgba(129, 140, 248, 0.22));
+      border: 1px solid var(--cyan-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--cyan);
+      box-shadow: 0 6px 20px rgba(56, 189, 248, 0.14);
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 16.5px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    /* 主容器與卡片 */
+    .container {
+      max-width: 1340px;
+      margin: 0 auto;
+      padding: 20px 20px 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
+    .step-emerald { background: var(--emerald-dim); color: var(--emerald); border: 1px solid var(--emerald-border); }
+    .step-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber-border); }
+    .step-indigo { background: var(--indigo-dim); color: var(--indigo); border: 1px solid var(--indigo-border); }
+    .step-purple { background: var(--purple-dim); color: var(--purple-light); border: 1px solid var(--purple-border); }
+
+    .section-title h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* 徽章與按鈕 */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+    }
+
+    .badge-cyan { background: var(--cyan-dim); border-color: var(--cyan-border); color: var(--cyan); }
+    .badge-emerald { background: var(--emerald-dim); border-color: var(--emerald-border); color: var(--emerald); }
+    .badge-amber { background: var(--amber-dim); border-color: var(--amber-border); color: var(--amber); }
+    .badge-purple { background: var(--purple-dim); border-color: var(--purple-border); color: var(--purple-light); }
+    .badge-rose { background: var(--rose-dim); border-color: var(--rose-border); color: var(--rose); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 9px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      border-color: var(--cyan);
+      color: var(--cyan);
+      background: rgba(56, 189, 248, 0.1);
+    }
+
+    .btn:active {
+      transform: translateY(1px);
+    }
+
+    .btn-sm {
+      padding: 5px 10px;
+      font-size: 11.5px;
+      border-radius: 7px;
+    }
+
+    .btn-cyan {
+      background: var(--cyan-dim);
+      border-color: var(--cyan-border);
+      color: var(--cyan);
+    }
+    .btn-cyan:hover {
+      background: rgba(56, 189, 248, 0.25);
+      color: #e0f2fe;
+    }
+
+    .btn-purple {
+      background: var(--purple-dim);
+      border-color: var(--purple-border);
+      color: var(--purple-light);
+    }
+    .btn-purple:hover {
+      background: rgba(168, 85, 247, 0.25);
+      color: #f3e8ff;
+    }
+
+    .btn-emerald {
+      background: var(--emerald-dim);
+      border-color: var(--emerald-border);
+      color: var(--emerald);
+    }
+    .btn-emerald:hover {
+      background: rgba(52, 211, 153, 0.25);
+      color: #d1fae5;
+    }
+
+    /* 快速預設按鈕列 */
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preset-btn {
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-inset);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-btn:hover,
+    .preset-btn.active {
+      border-color: var(--cyan-border);
+      background: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    /* 表單與輸入元件 */
+    .label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-inset);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    }
+
+    .select option {
+      background: #0f172a;
+      color: var(--text-primary);
+    }
+
+    .input-sm,
+    .select-sm {
+      padding: 6px 10px;
+      font-size: 12.5px;
+      border-radius: 8px;
+    }
+
+    /* 網格佈局 */
+    .grid-config {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .grid-p-n {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* 提示框 */
+    .info-box {
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--bg-inset);
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .info-box.ok {
+      border-color: var(--emerald-border);
+      background: var(--emerald-dim);
+      color: #d1fae5;
+    }
+
+    .info-box.warn {
+      border-color: var(--amber-border);
+      background: var(--amber-dim);
+      color: #fef3c7;
+    }
+
+    .info-box.err {
+      border-color: var(--rose-border);
+      background: var(--rose-dim);
+      color: #ffe4e6;
+    }
+
+    /* 分段切換 */
+    .seg-toggle {
+      display: inline-flex;
+      background: var(--bg-inset);
+      border: 1px solid var(--border-strong);
+      border-radius: 9px;
+      padding: 3px;
+      gap: 3px;
+    }
+
+    .seg-btn {
+      padding: 5px 11px;
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .seg-btn.active {
+      background: var(--cyan-dim);
+      color: var(--cyan);
+    }
+
+    /* 自訂多項式輸入 */
+    .custom-poly-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      background: var(--bg-inset);
+    }
+
+    .custom-term {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+
+    .custom-term input {
+      width: 44px;
+      padding: 5px 4px;
+      text-align: center;
+      border-radius: 7px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 700;
+      outline: none;
+    }
+
+    .custom-term input:focus {
+      border-color: var(--cyan);
+    }
+
+    /* 區塊 2 內嵌元素卡片 */
+    .elem-subcard {
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .coeff-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .coeff-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .coeff-cell span {
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    .coeff-box {
+      width: 44px;
+      padding: 7px 4px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .coeff-box:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .coeff-box.purple:focus {
+      border-color: var(--purple-light);
+      box-shadow: 0 0 0 2px rgba(168, 85, 247, 0.2);
+    }
+
+    .poly-preview {
+      margin-top: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(17, 24, 39, 0.9);
+      padding: 9px 13px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .poly-preview-expr {
+      font-family: var(--font-mono);
+      font-size: 15px;
+      font-weight: 700;
+      text-align: right;
+      word-break: break-word;
+    }
+
+    /* 運算子列 */
+    .op-bar {
+      margin-top: 16px;
+      margin-bottom: 16px;
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 12px 16px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .op-group {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 11px;
+      padding: 4px;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .op-btn {
+      padding: 7px 17px;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .op-btn:hover {
+      color: var(--text-primary);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .op-btn.active {
+      background: var(--cyan);
+      color: #082f49;
+      box-shadow: 0 4px 14px rgba(56, 189, 248, 0.35);
+    }
+
+    /* 結果卡片 */
+    .result-hero {
+      border-radius: 14px;
+      border: 1px solid var(--cyan-border);
+      background: linear-gradient(135deg, rgba(11, 17, 32, 0.96), rgba(14, 42, 66, 0.45));
+      padding: 16px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .result-hero.error {
+      border-color: var(--rose-border);
+      background: var(--rose-dim);
+    }
+
+    .result-poly {
+      font-family: var(--font-mono);
+      font-size: 21px;
+      font-weight: 700;
+      color: #f8fafc;
+      word-break: break-word;
+    }
+
+    .metric-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .metric-chip {
+      background: rgba(9, 13, 22, 0.82);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 7px 12px;
+      min-width: 82px;
+    }
+
+    .metric-chip .k {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    .metric-chip .v {
+      font-family: var(--font-mono);
+      font-size: 13.5px;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    /* 推導步驟 */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step-item {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-inset);
+      padding: 13px 16px;
+    }
+
+    .step-item-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 6px;
+    }
+
+    .step-item-title.amber { color: var(--amber); }
+    .step-item-title.emerald { color: var(--emerald); }
+
+    .step-item-body {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.65;
+      overflow-x: auto;
+    }
+
+    /* 反元素子框 */
+    .inv-card-inner {
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .inv-box {
+      border-radius: 11px;
+      padding: 13px 15px;
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .inv-box.add {
+      border-color: var(--amber-border);
+      background: rgba(251, 191, 36, 0.05);
+    }
+
+    .inv-box.mul {
+      border-color: var(--emerald-border);
+      background: rgba(52, 211, 153, 0.05);
+    }
+
+    .inv-box.none {
+      border-color: var(--rose-border);
+      background: rgba(251, 113, 133, 0.06);
+    }
+
+    /* =========================================================================
+       區塊 4：完整元素總表 — 進位制整合搜尋列與多條件篩選面板
+       ========================================================================= */
+    .filter-panel {
+      background: var(--bg-inset);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .filter-search-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      gap: 10px;
+    }
+
+    /* 整合式進位制搜尋框 */
+    .composite-search {
+      flex: 1 1 360px;
+      display: flex;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .composite-search:focus-within {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.16);
+    }
+
+    .composite-search.is-invalid {
+      border-color: var(--rose);
+      box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.18);
+    }
+
+    .radix-select {
+      flex: 0 0 auto;
+      padding: 8px 12px;
+      border: none;
+      border-right: 1px solid var(--border-strong);
+      background: #162033;
+      color: var(--cyan);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      height: 100%;
+    }
+
+    .radix-select option {
+      background: #0f172a;
+      color: var(--text-primary);
+    }
+
+    .composite-input-wrap {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      min-width: 0;
+      padding: 0 10px;
+      gap: 8px;
+    }
+
+    .search-svg {
+      flex-shrink: 0;
+      color: var(--text-muted);
+    }
+
+    .composite-input {
+      flex: 1 1 auto;
+      min-width: 120px;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 8px 0;
+      outline: none;
+    }
+
+    .composite-input::placeholder {
+      color: var(--text-muted);
+      font-family: var(--font-sans);
+      font-size: 12.5px;
+    }
+
+    /* 即時進位換算 / 驗證徽章 */
+    .search-live-badge {
+      flex-shrink: 0;
+      padding: 3px 9px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      max-width: 290px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .search-live-badge.info {
+      background: var(--cyan-dim);
+      border: 1px solid var(--cyan-border);
+      color: var(--cyan);
+    }
+
+    .search-live-badge.warn {
+      background: var(--amber-dim);
+      border: 1px solid var(--amber-border);
+      color: var(--amber);
+    }
+
+    .search-live-badge.error {
+      background: var(--rose-dim);
+      border: 1px solid var(--rose-border);
+      color: var(--rose);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+      gap: 10px 12px;
+    }
+
+    .filter-field label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 5px;
+    }
+
+    .range-pair {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .range-pair span {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    /* 快捷篩選標籤 */
+    .chip-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .chip {
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--bg-card);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .chip:hover {
+      border-color: var(--cyan-border);
+      color: var(--text-primary);
+    }
+
+    .chip.active {
+      background: var(--cyan-dim);
+      border-color: var(--cyan);
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .chip.active-purple {
+      background: var(--purple-dim);
+      border-color: var(--purple-light);
+      color: var(--purple-light);
+      font-weight: 600;
+    }
+
+    .chip.active-emerald {
+      background: var(--emerald-dim);
+      border-color: var(--emerald);
+      color: var(--emerald);
+      font-weight: 600;
+    }
+
+    .chip.active-amber {
+      background: var(--amber-dim);
+      border-color: var(--amber);
+      color: var(--amber);
+      font-weight: 600;
+    }
+
+    /* 表格與固定表頭 */
+    .table-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg-inset);
+    }
+
+    .table-scroll {
+      max-height: 600px;
+      overflow: auto;
+    }
+
+    .table-scroll.expanded {
+      max-height: none;
+      overflow-x: auto;
+    }
+
+    table.gf-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+    }
+
+    .gf-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      background: #0f172a;
+      color: var(--text-secondary);
+      font-family: var(--font-sans);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    .gf-table thead th.sortable {
+      cursor: pointer;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+
+    .gf-table thead th.sortable:hover {
+      color: var(--cyan);
+      background: #162238;
+    }
+
+    .sort-arrow {
+      display: inline-block;
+      margin-left: 4px;
+      font-size: 11px;
+      opacity: 0.45;
+    }
+
+    th.sorted .sort-arrow {
+      opacity: 1;
+      color: var(--cyan);
+    }
+
+    .gf-table tbody tr {
+      border-bottom: 1px solid rgba(31, 41, 55, 0.78);
+      transition: background 0.1s ease;
+    }
+
+    .gf-table tbody tr:hover {
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    .gf-table tbody tr.row-is-a {
+      background: rgba(56, 189, 248, 0.1);
+      box-shadow: inset 3px 0 0 var(--cyan);
+    }
+
+    .gf-table tbody tr.row-is-b {
+      background: rgba(168, 85, 247, 0.11);
+      box-shadow: inset 3px 0 0 var(--purple-light);
+    }
+
+    .gf-table tbody tr.row-is-ab {
+      background: rgba(52, 211, 153, 0.11);
+      box-shadow: inset 3px 0 0 var(--emerald);
+    }
+
+    .gf-table tbody td {
+      padding: 8px 12px;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .pill-tag {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 5px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-left: 4px;
+      vertical-align: middle;
+    }
+
+    .pill-a { background: var(--cyan-dim); color: var(--cyan); border: 1px solid var(--cyan-border); }
+    .pill-b { background: var(--purple-dim); color: var(--purple-light); border: 1px solid var(--purple-border); }
+    .pill-prim { background: var(--purple-dim); color: var(--purple-light); border: 1px solid var(--purple-border); }
+
+    /* Toast 通知 */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      max-width: 350px;
+      padding: 11px 16px;
+      border-radius: 12px;
+      border: 1px solid var(--cyan-border);
+      background: rgba(15, 23, 42, 0.96);
+      color: var(--text-primary);
+      font-size: 13px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(8px);
+    }
+
+    /* 響應式斷點 */
+    @media (max-width: 960px) {
+      .grid-config,
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .container {
+        padding: 14px 12px 48px;
+      }
+      .card {
+        padding: 15px 14px;
+      }
+      .grid-3 {
+        grid-template-columns: 1fr;
+      }
+      .composite-search {
+        flex-wrap: wrap;
+      }
+      .radix-select {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      .search-live-badge {
+        max-width: 100%;
+      }
+      .op-btn {
+        padding: 7px 12px;
+        font-size: 12.5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 頁首 -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo">GF</div>
+        <div>
+          <h1>Galois Field <span class="mono" style="color: var(--cyan);">GF(p<sup>n</sup>)</span> 有限體互動運算與完整元素探索工具</h1>
+          <p>不可約多項式驗證・四則運算雙視角推導・反元素驗算・完整元素與多進位條件篩選總表</p>
+        </div>
+      </div>
+      <div id="headerBadges" class="header-badges"></div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Toast 通知 (不使用 alert/confirm) -->
+    <div id="toastBox" class="toast hidden" role="status" aria-live="polite"></div>
+
+    <!-- =======================================================================
+         區塊 1：有限體 GF(p^n) 與不可約多項式設定
+         ======================================================================= -->
+    <section class="card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="step-badge step-cyan">1</span>
+          <h2>有限體 GF(p<sup>n</sup>) 與不可約多項式設定</h2>
+        </div>
+
+        <div class="preset-bar" id="presetBar">
+          <span style="font-size: 12px; color: var(--text-muted); margin-right: 2px;">快速預設：</span>
+          <button class="preset-btn active" data-preset="2,8,11D">GF(2⁸) 0x11D (RS/QR, g=2)</button>
+          <button class="preset-btn" data-preset="2,8,11B">GF(2⁸) AES 0x11B (g=3)</button>
+          <button class="preset-btn" data-preset="2,3,B">GF(2³) x³+x+1</button>
+          <button class="preset-btn" data-preset="2,4,13">GF(2⁴) x⁴+x+1</button>
+          <button class="preset-btn" data-preset="3,2,1,0,1">GF(3²) x²+1</button>
+          <button class="preset-btn" data-preset="5,2,2,0,1">GF(5²) x²+2</button>
+          <button class="preset-btn" data-preset="7,1">GF(7¹)</button>
+        </div>
+      </div>
+
+      <div class="grid-config">
+        <!-- 左側：p 與 n 輸入 -->
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <div class="grid-p-n">
+            <div>
+              <label class="label" for="inputP">質數特徵 <span class="mono" style="color: var(--cyan);">p</span></label>
+              <input id="inputP" class="input" type="number" min="2" max="997" value="2" />
+            </div>
+            <div>
+              <label class="label" for="inputN">擴展次數 <span class="mono" style="color: var(--cyan);">n</span> (1~12)</label>
+              <input id="inputN" class="input" type="number" min="1" max="12" value="8" />
+            </div>
+          </div>
+
+          <div id="paramStatus" class="info-box"></div>
+          <div id="generatorBanner" class="info-box"></div>
+        </div>
+
+        <!-- 右側：不可約多項式選擇與自訂驗證 -->
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;">
+            <label class="label" style="margin: 0;">不可約多項式 <span class="mono" style="color: var(--cyan);">m(x)</span>（模多項式）</label>
+            <div id="polyModeToggle" class="seg-toggle">
+              <button id="btnPolyList" class="seg-btn active" type="button">從清單選擇</button>
+              <button id="btnPolyCustom" class="seg-btn" type="button">自訂多項式</button>
+            </div>
+          </div>
+
+          <!-- n=1 質數體說明 -->
+          <div id="primeFieldNotice" class="info-box ok hidden">
+            <strong id="primeFieldLabel" class="mono">GF(7)</strong> 為質數體（<span class="mono">n = 1</span>），所有元素為整數 <span class="mono">0 ~ p−1</span>，加減乘除直接對質數 <span class="mono">p</span> 取模，無需不可約多項式。
+          </div>
+
+          <!-- 清單模式 -->
+          <div id="polyListPanel" style="display: flex; flex-direction: column; gap: 10px;">
+            <select id="polySelect" class="select"></select>
+            <div id="polySelectedInfo" class="info-box"></div>
+          </div>
+
+          <!-- 自訂多項式模式 -->
+          <div id="polyCustomPanel" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <div id="customPolyHexRow" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <label class="label" for="customPolyHex" style="margin: 0; white-space: nowrap;">Hex 快速輸入 (p = 2)：</label>
+              <input id="customPolyHex" class="input input-sm" type="text" placeholder="例如 11D 或 0x11B" style="max-width: 190px; text-transform: uppercase;" />
+            </div>
+            <div id="customPolyInputs" class="custom-poly-wrap"></div>
+            <div id="customPolyValidation" class="info-box"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         區塊 2：元素輸入與四則運算 (加、減、乘、除)
+         ======================================================================= -->
+    <section class="card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="step-badge step-emerald">2</span>
+          <h2>元素輸入與四則運算（加、減、乘、除）</h2>
+        </div>
+        <div id="resultFormulaHeader" class="mono poly-expr" style="font-size: 12.5px; color: var(--text-secondary);"></div>
+      </div>
+
+      <!-- 元素 A 與元素 B 並排卡片 -->
+      <div class="grid-2">
+        <!-- 元素 A -->
+        <div class="elem-subcard">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="step-badge step-cyan" style="width: 24px; height: 24px; font-size: 12px;">A</span>
+              <strong style="font-size: 14.5px;">元素 A</strong>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="btnRandA" class="btn btn-sm" type="button">隨機 A</button>
+              <button id="btnZeroA" class="btn btn-sm" type="button">歸零</button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>多項式係數 <span class="mono">(0 ~ <span class="maxCoeffLabel">1</span>)</span></span>
+            <span id="vecLabelA" class="mono" style="color: var(--text-muted);"></span>
+          </div>
+          <div id="coeffInputsA" class="coeff-row"></div>
+
+          <!-- p=2 同步輸入 -->
+          <div id="p2SyncA" class="grid-3" style="margin-top: 12px;">
+            <div>
+              <label class="label" style="font-size: 11px;">十進位 (Dec)</label>
+              <input id="decInputA" class="input input-sm" type="number" min="0" />
+            </div>
+            <div>
+              <label class="label" style="font-size: 11px;">二進位 (Bin)</label>
+              <input id="binInputA" class="input input-sm" type="text" />
+            </div>
+            <div>
+              <label class="label" style="font-size: 11px;">十六進位 (Hex)</label>
+              <input id="hexInputA" class="input input-sm" type="text" style="text-transform: uppercase;" />
+            </div>
+          </div>
+
+          <!-- p>2 同步輸入 -->
+          <div id="pGt2SyncA" class="hidden" style="margin-top: 12px;">
+            <label class="label" style="font-size: 11px;">十進位編碼 (0 ~ pⁿ−1)</label>
+            <input id="basePInputA" class="input input-sm" type="number" min="0" />
+          </div>
+
+          <div class="poly-preview">
+            <span class="mono" style="font-size: 12px; color: var(--text-muted);">A(x) =</span>
+            <div id="polyPreviewA" class="poly-preview-expr poly-expr" style="color: var(--cyan);"></div>
+          </div>
+        </div>
+
+        <!-- 元素 B -->
+        <div class="elem-subcard">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="step-badge step-purple" style="width: 24px; height: 24px; font-size: 12px;">B</span>
+              <strong style="font-size: 14.5px;">元素 B</strong>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button id="btnRandB" class="btn btn-sm" type="button">隨機 B</button>
+              <button id="btnZeroB" class="btn btn-sm" type="button">歸零</button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-secondary); margin-bottom: 6px;">
+            <span>多項式係數 <span class="mono">(0 ~ <span class="maxCoeffLabel">1</span>)</span></span>
+            <span id="vecLabelB" class="mono" style="color: var(--text-muted);"></span>
+          </div>
+          <div id="coeffInputsB" class="coeff-row"></div>
+
+          <!-- p=2 同步輸入 -->
+          <div id="p2SyncB" class="grid-3" style="margin-top: 12px;">
+            <div>
+              <label class="label" style="font-size: 11px;">十進位 (Dec)</label>
+              <input id="decInputB" class="input input-sm" type="number" min="0" />
+            </div>
+            <div>
+              <label class="label" style="font-size: 11px;">二進位 (Bin)</label>
+              <input id="binInputB" class="input input-sm" type="text" />
+            </div>
+            <div>
+              <label class="label" style="font-size: 11px;">十六進位 (Hex)</label>
+              <input id="hexInputB" class="input input-sm" type="text" style="text-transform: uppercase;" />
+            </div>
+          </div>
+
+          <!-- p>2 同步輸入 -->
+          <div id="pGt2SyncB" class="hidden" style="margin-top: 12px;">
+            <label class="label" style="font-size: 11px;">十進位編碼 (0 ~ pⁿ−1)</label>
+            <input id="basePInputB" class="input input-sm" type="number" min="0" />
+          </div>
+
+          <div class="poly-preview">
+            <span class="mono" style="font-size: 12px; color: var(--text-muted);">B(x) =</span>
+            <div id="polyPreviewB" class="poly-preview-expr poly-expr" style="color: var(--purple-light);"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 運算子選擇與快捷操作列 -->
+      <div class="op-bar">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+          <span style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary);">選擇運算：</span>
+          <div class="op-group" id="opSelector">
+            <button class="op-btn" data-op="add" type="button">＋ 加法</button>
+            <button class="op-btn" data-op="sub" type="button">－ 減法</button>
+            <button class="op-btn active" data-op="mul" type="button">× 乘法</button>
+            <button class="op-btn" data-op="div" type="button">÷ 除法</button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button id="btnSwap" class="btn btn-sm" type="button">⇄ 交換 A ↔ B</button>
+          <button id="btnRandBoth" class="btn btn-sm btn-emerald" type="button">隨機產生 A &amp; B</button>
+        </div>
+      </div>
+
+      <!-- 運算結果主區塊 -->
+      <div id="resultHero" class="result-hero"></div>
+
+      <!-- Step-by-Step 推導過程 -->
+      <div style="font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 10px;">
+        Step-by-Step 計算推導過程
+      </div>
+      <div id="stepsContainer" class="step-list"></div>
+    </section>
+
+    <!-- =======================================================================
+         區塊 3：加法與乘法反元素總覽 (元素 A 與元素 B)
+         ======================================================================= -->
+    <section class="card">
+      <div class="section-head">
+        <div class="section-title">
+          <span class="step-badge step-amber">3</span>
+          <h2>加法與乘法反元素總覽（元素 A 與元素 B）</h2>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div id="inverseCardA" class="inv-card-inner"></div>
+        <div id="inverseCardB" class="inv-card-inner"></div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         區塊 4：完整元素與反元素總表 (含頂部進位制選擇搜尋框與多條件篩選)
+         ======================================================================= -->
+    <section class="card" id="tableSection">
+      <div class="section-head" style="margin-bottom: 14px;">
+        <div class="section-title">
+          <span class="step-badge step-purple">4</span>
+          <div>
+            <h2>
+              完整元素與反元素總表
+              <span id="tableCountBadge" class="badge badge-cyan mono" style="margin-left: 8px; vertical-align: middle;">顯示 256 / 256 筆</span>
+            </h2>
+            <div id="tableGenSummary" style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;"></div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+          <button id="btnToggleExpand" class="btn btn-sm" type="button">展開完整高度</button>
+          <button id="btnExportCsv" class="btn btn-sm btn-emerald" type="button">匯出 CSV</button>
+        </div>
+      </div>
+
+      <!-- 超過 2048 筆提示 -->
+      <div id="tableTooLargeNotice" class="info-box warn hidden"></div>
+
+      <!-- 總表互動主體 -->
+      <div id="tableInteractiveArea">
+        <div class="filter-panel">
+          <!-- 第一排：整合進位制選擇器的頂部搜尋列 + 重置 -->
+          <div class="filter-search-row">
+            <div id="compositeSearchBox" class="composite-search">
+              <select id="filterRadixMode" class="radix-select" aria-label="選擇搜尋進位制">
+                <option value="all">綜合搜尋 (全部)</option>
+                <option value="bin">二進位 (Bin)</option>
+                <option value="oct">八進位 (Oct)</option>
+                <option value="dec">十進位 (Dec)</option>
+                <option value="hex">十六進位 (Hex)</option>
+                <option value="basep" id="optBaseP">2 進位係數 (Base 2)</option>
+                <option value="poly">多項式 (Poly)</option>
+              </select>
+
+              <div class="composite-input-wrap">
+                <svg class="search-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input
+                  id="filterGeneral"
+                  class="composite-input"
+                  type="text"
+                  autocomplete="off"
+                  spellcheck="false"
+                  placeholder="綜合搜尋：十進位 (29)、Hex (0x1D / 1D)、二進位 (00011101)、多項式 (x^4+x^3)、反元素或步數 (g^8)..."
+                />
+                <span id="searchLiveBadge" class="search-live-badge hidden"></span>
+              </div>
+            </div>
+
+            <button id="btnResetFilters" class="btn btn-sm" type="button">↺ 重置所有篩選</button>
+          </div>
+
+          <!-- 第二排：結構化多條件篩選網格 -->
+          <div class="filter-grid">
+            <div class="filter-field">
+              <label>十進位數值範圍 (Dec)</label>
+              <div class="range-pair">
+                <input id="filterDecMin" class="input input-sm" type="number" min="0" placeholder="Min" />
+                <span>~</span>
+                <input id="filterDecMax" class="input input-sm" type="number" min="0" placeholder="Max" />
+              </div>
+            </div>
+
+            <div class="filter-field">
+              <label>Log 步數 / 指數 k（如 8、0-15、>=200）</label>
+              <input id="filterLogStep" class="input input-sm" type="text" placeholder="精確 (8) 或範圍 (0-15)" />
+            </div>
+
+            <div class="filter-field">
+              <label>指定乘法反元素 (a⁻¹)</label>
+              <input id="filterMulInv" class="input input-sm" type="text" placeholder="數值或 Hex (如 142 / 0x8E)" />
+            </div>
+
+            <div class="filter-field">
+              <label>多項式最高次方 (Degree)</label>
+              <select id="filterDegree" class="select select-sm"></select>
+            </div>
+
+            <div class="filter-field">
+              <label>乘法階數 (Order)</label>
+              <select id="filterOrder" class="select select-sm"></select>
+            </div>
+
+            <div class="filter-field">
+              <label id="filterWeightLabel">非零項數 / 漢明權重 (Popcount)</label>
+              <select id="filterWeight" class="select select-sm"></select>
+            </div>
+          </div>
+
+          <!-- 第三排：快捷篩選標籤 -->
+          <div class="chip-bar" id="quickChipBar">
+            <span style="font-size: 11.5px; color: var(--text-muted); margin-right: 2px;">快捷條件：</span>
+            <button class="chip active" data-chip="all" type="button">全部元素</button>
+            <button class="chip" data-chip="primitive" type="button">本原元 / 產生器 (Order = pⁿ−1)</button>
+            <button class="chip" data-chip="selfMulInv" type="button">自身乘法反元素 (a = a⁻¹)</button>
+            <button class="chip" data-chip="selfAddInv" type="button">自身加法反元素 (a = −a)</button>
+            <button class="chip" data-chip="abOnly" type="button">僅顯示當前 A / B 與其反元素</button>
+          </div>
+        </div>
+
+        <!-- 表格摘要列 -->
+        <div class="table-toolbar">
+          <div id="tableStatusText" style="font-size: 12px; color: var(--text-secondary);"></div>
+          <div style="font-size: 11.5px; color: var(--text-muted);">
+            點擊表頭可排序・點擊右側按鈕可快速帶入元素 A 或 B
+          </div>
+        </div>
+
+        <!-- 完整資料表容器 -->
+        <div class="table-container">
+          <div id="tableScrollBox" class="table-scroll">
+            <table class="gf-table">
+              <thead>
+                <tr id="refTableHead"></tr>
+              </thead>
+              <tbody id="refTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* =======================================================================
+         1. 核心有限體數學引擎 (Exact GF(p)[x] / m(x))
+         多項式表示：[c_0, c_1, ..., c_d]，索引 i 為 x^i 的係數；零多項式為 [0]
+         ======================================================================= */
+      const GFMath = {
+        mod(a, p) {
+          return ((a % p) + p) % p;
+        },
+
+        gcdInt(a, b) {
+          a = Math.abs(a);
+          b = Math.abs(b);
+          while (b !== 0) {
+            const t = a % b;
+            a = b;
+            b = t;
+          }
+          return a;
+        },
+
+        isPrime(num) {
+          if (!Number.isInteger(num) || num < 2) return false;
+          if (num === 2 || num === 3) return true;
+          if (num % 2 === 0 || num % 3 === 0) return false;
+          for (let i = 5; i * i <= num; i += 6) {
+            if (num % i === 0 || num % (i + 2) === 0) return false;
+          }
+          return true;
+        },
+
+        modInv(a, p) {
+          a = this.mod(a, p);
+          if (a === 0) return null;
+          let t = 0, newT = 1;
+          let r = p, newR = a;
+          while (newR !== 0) {
+            const q = Math.floor(r / newR);
+            [t, newT] = [newT, t - q * newT];
+            [r, newR] = [newR, r - q * newR];
+          }
+          return r > 1 ? null : this.mod(t, p);
+        },
+
+        primeFactorsBigInt(n) {
+          const factors = new Set();
+          let d = 2n;
+          while (d * d <= n) {
+            while (n % d === 0n) {
+              factors.add(d);
+              n /= d;
+            }
+            d = d === 2n ? 3n : d + 2n;
+            if (d > 1000000n) break;
+          }
+          if (n > 1n) factors.add(n);
+          return Array.from(factors);
+        },
+
+        trim(poly, p) {
+          const res = poly.map((c) => this.mod(c, p));
+          while (res.length > 1 && res[res.length - 1] === 0) res.pop();
+          return res.length === 0 ? [0] : res;
+        },
+
+        isZero(poly) {
+          return poly.length === 1 && poly[0] === 0;
+        },
+
+        isOne(poly) {
+          return poly.length === 1 && poly[0] === 1;
+        },
+
+        deg(poly) {
+          return this.isZero(poly) ? -1 : poly.length - 1;
+        },
+
+        weight(poly) {
+          if (this.isZero(poly)) return 0;
+          let cnt = 0;
+          for (let i = 0; i < poly.length; i++) if (poly[i] !== 0) cnt++;
+          return cnt;
+        },
+
+        equals(a, b) {
+          if (a.length !== b.length) return false;
+          for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+          return true;
+        },
+
+        makeMonic(poly, p) {
+          const a = this.trim(poly, p);
+          if (this.isZero(a)) return [0];
+          const lc = a[a.length - 1];
+          if (lc === 1) return a;
+          const inv = this.modInv(lc, p);
+          return a.map((c) => this.mod(c * inv, p));
+        },
+
+        polyAdd(a, b, p) {
+          const len = Math.max(a.length, b.length);
+          const res = new Array(len);
+          for (let i = 0; i < len; i++) res[i] = this.mod((a[i] || 0) + (b[i] || 0), p);
+          return this.trim(res, p);
+        },
+
+        polySub(a, b, p) {
+          const len = Math.max(a.length, b.length);
+          const res = new Array(len);
+          for (let i = 0; i < len; i++) res[i] = this.mod((a[i] || 0) - (b[i] || 0), p);
+          return this.trim(res, p);
+        },
+
+        polyNeg(a, p) {
+          return this.trim(a.map((c) => this.mod(-c, p)), p);
+        },
+
+        polyMul(a, b, p) {
+          if (this.isZero(a) || this.isZero(b)) return [0];
+          const res = new Array(a.length + b.length - 1).fill(0);
+          for (let i = 0; i < a.length; i++) {
+            if (a[i] === 0) continue;
+            for (let j = 0; j < b.length; j++) {
+              res[i + j] = (res[i + j] + a[i] * b[j]) % p;
+            }
+          }
+          return this.trim(res, p);
+        },
+
+        polyDivMod(a, b, p) {
+          let r = this.trim(a, p);
+          const d = this.trim(b, p);
+          if (this.isZero(d)) throw new Error('多項式除數不可為 0');
+          const degD = this.deg(d);
+          if (this.deg(r) < degD) return { q: [0], r };
+
+          const invLc = this.modInv(d[degD], p);
+          const q = new Array(this.deg(r) - degD + 1).fill(0);
+
+          while (!this.isZero(r) && this.deg(r) >= degD) {
+            const shift = this.deg(r) - degD;
+            const factor = this.mod(r[r.length - 1] * invLc, p);
+            q[shift] = factor;
+            for (let i = 0; i <= degD; i++) {
+              r[shift + i] = this.mod(r[shift + i] - factor * d[i], p);
+            }
+            r = this.trim(r, p);
+          }
+          return { q: this.trim(q, p), r };
+        },
+
+        polyMod(a, m, p) {
+          return this.polyDivMod(a, m, p).r;
+        },
+
+        polyMulMod(a, b, m, p) {
+          return this.polyMod(this.polyMul(a, b, p), m, p);
+        },
+
+        polyPowMod(base, exp, m, p) {
+          let result = [1];
+          let b = this.polyMod(base, m, p);
+          let e = BigInt(exp);
+          while (e > 0n) {
+            if ((e & 1n) === 1n) result = this.polyMulMod(result, b, m, p);
+            b = this.polyMulMod(b, b, m, p);
+            e >>= 1n;
+          }
+          return result;
+        },
+
+        polyGcd(a, b, p) {
+          let r0 = this.trim(a, p);
+          let r1 = this.trim(b, p);
+          while (!this.isZero(r1)) {
+            const { r } = this.polyDivMod(r0, r1, p);
+            r0 = r1;
+            r1 = r;
+          }
+          return this.makeMonic(r0, p);
+        },
+
+        polyExtGcd(a, b, p) {
+          let r0 = this.trim(a, p), r1 = this.trim(b, p);
+          let s0 = [1], s1 = [0];
+          let t0 = [0], t1 = [1];
+
+          while (!this.isZero(r1)) {
+            const { q, r } = this.polyDivMod(r0, r1, p);
+            const s2 = this.polySub(s0, this.polyMul(q, s1, p), p);
+            const t2 = this.polySub(t0, this.polyMul(q, t1, p), p);
+            r0 = r1; r1 = r;
+            s0 = s1; s1 = s2;
+            t0 = t1; t1 = t2;
+          }
+
+          if (this.isZero(r0)) return { g: [0], x: [0], y: [0] };
+          const invLc = this.modInv(r0[r0.length - 1], p);
+          const scale = (poly) => this.trim(poly.map((c) => this.mod(c * invLc, p)), p);
+          return { g: scale(r0), x: scale(s0), y: scale(t0) };
+        },
+
+        fieldInv(a, m, p, n) {
+          const cleanA = this.trim(a, p);
+          if (this.isZero(cleanA)) return null;
+          if (n === 1) {
+            const inv = this.modInv(cleanA[0], p);
+            return inv === null ? null : [inv];
+          }
+          const { g, x } = this.polyExtGcd(cleanA, m, p);
+          if (!this.isOne(g)) return null;
+          return this.polyMod(x, m, p);
+        },
+
+        polyDerivative(f, p) {
+          if (f.length <= 1) return [0];
+          const res = [];
+          for (let i = 1; i < f.length; i++) res.push(this.mod(f[i] * i, p));
+          return this.trim(res, p);
+        },
+
+        // Rabin 不可約測試演算法
+        isIrreducible(poly, p) {
+          const f = this.makeMonic(poly, p);
+          const n = this.deg(f);
+          if (n <= 0) return false;
+          if (n === 1) return true;
+          if (f[0] === 0) return false;
+
+          const pBig = BigInt(p);
+          const xPoly = [0, 1];
+
+          const xPowPn = this.polyPowMod(xPoly, pBig ** BigInt(n), f, p);
+          if (!this.equals(xPowPn, xPoly)) return false;
+
+          const qFactors = this.primeFactorsBigInt(BigInt(n));
+          for (const q of qFactors) {
+            const exp = pBig ** (BigInt(n) / q);
+            const xPow = this.polyPowMod(xPoly, exp, f, p);
+            const diff = this.polySub(xPow, xPoly, p);
+            const g = this.polyGcd(diff, f, p);
+            if (!this.isOne(g)) return false;
+          }
+          return true;
+        },
+
+        // 尋找可約多項式的非平凡因式 (Distinct-Degree + Cantor-Zassenhaus)
+        findNonTrivialFactor(poly, p) {
+          const f = this.makeMonic(poly, p);
+          const n = this.deg(f);
+          if (n <= 1) return null;
+          if (f[0] === 0) return [0, 1];
+
+          const deriv = this.polyDerivative(f, p);
+          if (!this.isZero(deriv)) {
+            const g = this.polyGcd(f, deriv, p);
+            if (this.deg(g) >= 1 && this.deg(g) < n) return g;
+          } else if (n % p === 0) {
+            const h = new Array(n / p + 1).fill(0);
+            for (let i = 0; i <= n; i += p) h[i / p] = f[i];
+            return this.makeMonic(h, p);
+          }
+
+          const pBig = BigInt(p);
+          const xPoly = [0, 1];
+          const half = Math.floor(n / 2);
+          let splitDeg = -1;
+          for (let k = 1; k <= half; k++) {
+            const xPow = this.polyPowMod(xPoly, pBig ** BigInt(k), f, p);
+            const diff = this.polySub(xPow, xPoly, p);
+            const g = this.polyGcd(diff, f, p);
+            if (this.deg(g) >= 1 && this.deg(g) < n) return g;
+            if (this.deg(g) === n) {
+              splitDeg = k;
+              break;
+            }
+          }
+
+          if (splitDeg >= 1) {
+            for (let attempt = 0; attempt < 40; attempt++) {
+              const randPoly = [];
+              for (let i = 0; i < n; i++) randPoly.push(Math.floor(Math.random() * p));
+              const a = this.trim(randPoly, p);
+              if (this.deg(a) < 1) continue;
+              const g1 = this.polyGcd(a, f, p);
+              if (this.deg(g1) >= 1 && this.deg(g1) < n) return g1;
+
+              let cand;
+              if (p === 2) {
+                cand = a;
+                let cur = a;
+                for (let j = 1; j < splitDeg; j++) {
+                  cur = this.polyMulMod(cur, cur, f, 2);
+                  cand = this.polyAdd(cand, cur, 2);
+                }
+              } else {
+                const exp = (pBig ** BigInt(splitDeg) - 1n) / 2n;
+                cand = this.polySub(this.polyPowMod(a, exp, f, p), [1], p);
+              }
+              const g2 = this.polyGcd(cand, f, p);
+              if (this.deg(g2) >= 1 && this.deg(g2) < n) return g2;
+            }
+          }
+          return null;
+        },
+
+        // 完整因式分解
+        factorCompletely(poly, p) {
+          const f = this.trim(poly, p);
+          const lc = f[f.length - 1];
+          const monic = this.makeMonic(f, p);
+          const factors = [];
+
+          const split = (cur, depth = 0) => {
+            if (this.deg(cur) <= 0 || depth > 32) return;
+            if (this.deg(cur) === 1 || this.isIrreducible(cur, p)) {
+              factors.push(cur);
+              return;
+            }
+            const fac = this.findNonTrivialFactor(cur, p);
+            if (!fac || this.deg(fac) <= 0 || this.deg(fac) >= this.deg(cur)) {
+              factors.push(cur);
+              return;
+            }
+            const { q } = this.polyDivMod(cur, fac, p);
+            split(this.makeMonic(fac, p), depth + 1);
+            split(this.makeMonic(q, p), depth + 1);
+          };
+
+          split(monic, 0);
+          factors.sort((a, b) => this.deg(a) - this.deg(b) || this.polyToInt(a, p) - this.polyToInt(b, p));
+          return { lc, factors };
+        },
+
+        isPrimitivePolynomial(m, p, n) {
+          if (n === 1) return true;
+          const orderBig = BigInt(p) ** BigInt(n) - 1n;
+          if (orderBig > 1000000000000n) return null;
+          const factors = this.primeFactorsBigInt(orderBig);
+          const xPoly = [0, 1];
+          for (const q of factors) {
+            const check = this.polyPowMod(xPoly, orderBig / q, m, p);
+            if (this.isOne(check)) return false;
+          }
+          return true;
+        },
+
+        intToPoly(val, p, n) {
+          const res = new Array(n).fill(0);
+          let cur = Math.max(0, Math.floor(val));
+          for (let i = 0; i < n; i++) {
+            res[i] = cur % p;
+            cur = Math.floor(cur / p);
+          }
+          return this.trim(res, p);
+        },
+
+        polyToInt(poly, p) {
+          let val = 0;
+          let mult = 1;
+          for (let i = 0; i < poly.length; i++) {
+            val += poly[i] * mult;
+            mult *= p;
+          }
+          return val;
+        },
+
+        generateIrreducibleList(p, n, limit = 40) {
+          if (n === 1) return [];
+          const results = [];
+          const seen = new Set();
+
+          const addIfValid = (poly, tag = '') => {
+            const clean = this.makeMonic(poly, p);
+            const key = clean.join(',');
+            if (seen.has(key)) return false;
+            if (this.isIrreducible(clean, p)) {
+              seen.add(key);
+              const isPrim = this.isPrimitivePolynomial(clean, p, n);
+              results.push({ poly: clean, isPrimitive: isPrim, tag });
+              return true;
+            }
+            return false;
+          };
+
+          // 經典不可約多項式優先置入
+          if (p === 2 && n === 8) {
+            addIfValid(this.intToPoly(0x11D, 2, 9), 'RS/QR 標準 0x11D');
+            addIfValid(this.intToPoly(0x11B, 2, 9), 'AES 標準 0x11B');
+            addIfValid(this.intToPoly(0x12B, 2, 9), '0x12B');
+            addIfValid(this.intToPoly(0x12D, 2, 9), '0x12D');
+            addIfValid(this.intToPoly(0x163, 2, 9), '0x163');
+          } else if (p === 2 && n === 3) {
+            addIfValid([1, 1, 0, 1], '0x0B');
+            addIfValid([1, 0, 1, 1], '0x0D');
+          } else if (p === 2 && n === 4) {
+            addIfValid([1, 1, 0, 0, 1], '0x13');
+            addIfValid([1, 0, 0, 1, 1], '0x19');
+            addIfValid([1, 1, 1, 1, 1], '0x1F');
+          } else if (p === 3 && n === 2) {
+            addIfValid([1, 0, 1], '經典 x²+1');
+            addIfValid([2, 1, 1], '');
+            addIfValid([2, 2, 1], '');
+          } else if (p === 5 && n === 2) {
+            addIfValid([2, 0, 1], '經典 x²+2');
+            addIfValid([3, 0, 1], '');
+          }
+
+          const totalBig = BigInt(p) ** BigInt(n);
+          if (totalBig <= 4096n) {
+            const totalSpace = Number(totalBig);
+            for (let v = 1; v < totalSpace && results.length < limit; v++) {
+              if (v % p === 0) continue;
+              const coeffs = this.intToPoly(v, p, n + 1);
+              while (coeffs.length < n) coeffs.push(0);
+              coeffs[n] = 1;
+              addIfValid(coeffs);
+            }
+          } else {
+            let attempts = 0;
+            while (results.length < Math.min(limit, 20) && attempts < 2400) {
+              attempts++;
+              const coeffs = new Array(n + 1).fill(0);
+              coeffs[0] = 1 + Math.floor(Math.random() * (p - 1));
+              for (let i = 1; i < n; i++) coeffs[i] = Math.floor(Math.random() * p);
+              coeffs[n] = 1;
+              addIfValid(coeffs);
+            }
+          }
+
+          return results;
+        },
+
+        // 建立 Exp/Log 循環群查表並自動尋找最小本原產生器 g (支援 p^n <= 2048)
+        buildExpLogTables(p, n, m) {
+          const sizeBig = BigInt(p) ** BigInt(n);
+          if (sizeBig > 2048n) return null;
+
+          const size = Number(sizeBig);
+          const order = size - 1;
+          if (order === 1) {
+            return {
+              generator: [1],
+              generatorInt: 1,
+              xIsPrimitive: true,
+              xOrder: 1,
+              order: 1,
+              expTable: [1, 1],
+              logTable: [null, 0],
+            };
+          }
+
+          const orderBig = BigInt(order);
+          const factors = this.primeFactorsBigInt(orderBig);
+
+          const intPowMod = (base, exp, modP) => {
+            let res = 1, b = base % modP, e = exp;
+            while (e > 0) {
+              if (e & 1) res = (res * b) % modP;
+              b = (b * b) % modP;
+              e >>= 1;
+            }
+            return res;
+          };
+
+          let generator = null;
+          let xOrder = null;
+
+          if (n === 1) {
+            for (let g = 2; g < p; g++) {
+              let ok = true;
+              for (const q of factors) {
+                if (intPowMod(g, Number(orderBig / q), p) === 1) {
+                  ok = false;
+                  break;
+                }
+              }
+              if (ok) {
+                generator = [g];
+                break;
+              }
+            }
+          } else {
+            let ordX = orderBig;
+            for (const q of factors) {
+              while (ordX % q === 0n) {
+                if (this.isOne(this.polyPowMod([0, 1], ordX / q, m, p))) ordX /= q;
+                else break;
+              }
+            }
+            xOrder = Number(ordX);
+
+            if (xOrder === order) {
+              generator = [0, 1];
+            } else {
+              for (let v = 2; v < size; v++) {
+                const cand = this.intToPoly(v, p, n);
+                if (this.equals(cand, [0, 1])) continue;
+                let ok = true;
+                for (const q of factors) {
+                  if (this.isOne(this.polyPowMod(cand, orderBig / q, m, p))) {
+                    ok = false;
+                    break;
+                  }
+                }
+                if (ok) {
+                  generator = cand;
+                  break;
+                }
+              }
+            }
+          }
+
+          if (!generator) return null;
+
+          const expTable = new Array(size);
+          const logTable = new Array(size).fill(null);
+          let cur = [1];
+          for (let i = 0; i < order; i++) {
+            const intVal = this.polyToInt(cur, p);
+            expTable[i] = intVal;
+            logTable[intVal] = i;
+            if (n === 1) cur = [(cur[0] * generator[0]) % p];
+            else cur = this.polyMulMod(cur, generator, m, p);
+          }
+          expTable[order] = 1;
+
+          return {
+            generator,
+            generatorInt: this.polyToInt(generator, p),
+            xIsPrimitive: n === 1 ? true : xOrder === order,
+            xOrder,
+            order,
+            expTable,
+            logTable,
+          };
+        },
+      };
+
+      /* =======================================================================
+         2. 格式化工具
+         ======================================================================= */
+      const Format = {
+        polyHTML(poly) {
+          if (!poly || GFMath.isZero(poly)) return '0';
+          const terms = [];
+          for (let i = poly.length - 1; i >= 0; i--) {
+            const c = poly[i];
+            if (c === 0) continue;
+            if (i === 0) terms.push(`${c}`);
+            else if (i === 1) terms.push(c === 1 ? 'x' : `${c}x`);
+            else terms.push(c === 1 ? `x<sup>${i}</sup>` : `${c}x<sup>${i}</sup>`);
+          }
+          return terms.length ? terms.join(' + ') : '0';
+        },
+
+        polyPlain(poly) {
+          if (!poly || GFMath.isZero(poly)) return '0';
+          const supMap = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+          const toSup = (num) => String(num).split('').map((d) => supMap[d] || d).join('');
+          const terms = [];
+          for (let i = poly.length - 1; i >= 0; i--) {
+            const c = poly[i];
+            if (c === 0) continue;
+            if (i === 0) terms.push(`${c}`);
+            else if (i === 1) terms.push(c === 1 ? 'x' : `${c}x`);
+            else terms.push(c === 1 ? `x${toSup(i)}` : `${c}x${toSup(i)}`);
+          }
+          return terms.join(' + ');
+        },
+
+        polyAscii(poly) {
+          if (!poly || GFMath.isZero(poly)) return '0';
+          const terms = [];
+          for (let i = poly.length - 1; i >= 0; i--) {
+            const c = poly[i];
+            if (c === 0) continue;
+            if (i === 0) terms.push(`${c}`);
+            else if (i === 1) terms.push(c === 1 ? 'x' : `${c}x`);
+            else terms.push(c === 1 ? `x^${i}` : `${c}x^${i}`);
+          }
+          return terms.join('+');
+        },
+
+        vectorStr(poly, n) {
+          const arr = [];
+          for (let i = n - 1; i >= 0; i--) arr.push(poly[i] || 0);
+          return `(${arr.join(', ')})`;
+        },
+
+        basePStr(poly, p, n) {
+          const digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          const arr = [];
+          for (let i = n - 1; i >= 0; i--) {
+            const c = poly[i] || 0;
+            arr.push(p <= 36 ? digits[c] : String(c));
+          }
+          return p <= 36 ? arr.join('') : arr.join(':');
+        },
+
+        binStr(val, bits) {
+          const s = val.toString(2).padStart(bits, '0');
+          return bits >= 8 ? s.replace(/(.{4})(?=.)/g, '$1 ') : s;
+        },
+
+        binCompact(val, bits) {
+          return val.toString(2).padStart(bits, '0');
+        },
+
+        hexStr(val, bits) {
+          const digits = Math.max(2, Math.ceil(bits / 4));
+          return '0x' + val.toString(16).toUpperCase().padStart(digits, '0');
+        },
+      };
+
+      /* =======================================================================
+         3. 應用程式狀態管理 (預設 GF(2^8), 0x11D, A=4, B=29, 乘法)
+         ======================================================================= */
+      const MAX_TABLE_SIZE = 2048;
+
+      const State = {
+        p: 2,
+        n: 8,
+        polyMode: 'list',
+        polyList: [],
+        selectedPolyIdx: 0,
+        customCoeffs: [1, 0, 1, 1, 1, 0, 0, 0, 1],
+        mPoly: [1, 0, 1, 1, 1, 0, 0, 0, 1], // 0x11D
+        mValid: true,
+        mIsPrimitive: true,
+        elemA: [0, 0, 1, 0, 0, 0, 0, 0], // 4 = x^2
+        elemB: [1, 0, 1, 1, 1, 0, 0, 0], // 29 = x^4 + x^3 + x^2 + 1
+        op: 'mul',
+        expLog: null,
+
+        tableData: [],
+        filteredRows: [],
+        tableExpandedHeight: false,
+        sortKey: 'dec',
+        sortDir: 'asc',
+        quickChip: 'all',
+        filters: {
+          radixMode: 'all', // 'all' | 'bin' | 'oct' | 'dec' | 'hex' | 'basep' | 'poly'
+          general: '',
+          decMin: '',
+          decMax: '',
+          logStep: '',
+          mulInv: '',
+          degree: 'all',
+          order: 'all',
+          weight: 'all',
+        },
+      };
+
+      const $ = (id) => document.getElementById(id);
+
+      let toastTimer = null;
+      function showToast(msg) {
+        const box = $('toastBox');
+        if (!box) return;
+        box.textContent = msg;
+        box.classList.remove('hidden');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => box.classList.add('hidden'), 2600);
+      }
+
+      function normalizeElem(arr, n, p) {
+        const out = new Array(n).fill(0);
+        for (let i = 0; i < n; i++) out[i] = GFMath.mod(arr[i] || 0, p);
+        return out;
+      }
+
+      function isSafeIntField(p, n) {
+        return (BigInt(p) ** BigInt(n)) <= BigInt(Number.MAX_SAFE_INTEGER);
+      }
+
+      /* =======================================================================
+         4. 區塊 1：有限體重建與不可約多項式管理
+         ======================================================================= */
+      function rebuildField(preferredPoly = null, keepInitialAB = false) {
+        const p = State.p;
+        const n = State.n;
+        const pValid = GFMath.isPrime(p);
+        const nValid = Number.isInteger(n) && n >= 1 && n <= 12;
+
+        const paramStatus = $('paramStatus');
+        const genBanner = $('generatorBanner');
+
+        if (!pValid) {
+          paramStatus.className = 'info-box err';
+          paramStatus.innerHTML = `<strong>錯誤：</strong><span class="mono">p = ${p}</span> 不是質數，請輸入質數（例如 2, 3, 5, 7, 11）。`;
+          genBanner.className = 'info-box hidden';
+          State.mValid = false;
+          State.expLog = null;
+          State.tableData = [];
+          renderCalculations();
+          applyFiltersAndRenderTable();
+          return;
+        }
+
+        if (!nValid) {
+          paramStatus.className = 'info-box err';
+          paramStatus.innerHTML = `<strong>錯誤：</strong>次數 <span class="mono">n</span> 須介於 1 ~ 12 之間。`;
+          genBanner.className = 'info-box hidden';
+          State.mValid = false;
+          State.expLog = null;
+          State.tableData = [];
+          renderCalculations();
+          applyFiltersAndRenderTable();
+          return;
+        }
+
+        const fieldOrderBig = BigInt(p) ** BigInt(n);
+        const orderStr = fieldOrderBig.toString();
+        const cyclicStr = (fieldOrderBig - 1n).toString();
+
+        paramStatus.className = 'info-box ok';
+        paramStatus.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <span>✓ 合法有限體 · 特徵 <span class="mono">p = ${p}</span></span>
+            <span class="mono" style="font-weight:700;">|GF| = ${orderStr}</span>
+          </div>
+        `;
+
+        $('headerBadges').innerHTML = `
+          <span class="badge badge-cyan">GF(${p}<sup>${n}</sup>)</span>
+          <span class="badge">元素總數 = ${orderStr}</span>
+          <span class="badge badge-amber">乘法群週期 = ${cyclicStr}</span>
+        `;
+
+        // 更新頂部搜尋進位選單中的 p 進位標籤
+        $('optBaseP').textContent = `${p} 進位係數 (Base ${p})`;
+        updateSearchPlaceholder();
+
+        if (n === 1) {
+          $('polyModeToggle').classList.add('hidden');
+          $('polyListPanel').classList.add('hidden');
+          $('polyCustomPanel').classList.add('hidden');
+          $('primeFieldNotice').classList.remove('hidden');
+          $('primeFieldLabel').textContent = `GF(${p})`;
+          State.mPoly = [0, 1];
+          State.mValid = true;
+          State.mIsPrimitive = true;
+        } else {
+          $('polyModeToggle').classList.remove('hidden');
+          $('primeFieldNotice').classList.add('hidden');
+          State.polyList = GFMath.generateIrreducibleList(p, n, 40);
+
+          State.selectedPolyIdx = 0;
+          if (preferredPoly) {
+            if (typeof preferredPoly === 'string' && p === 2) {
+              const targetVal = parseInt(preferredPoly, 16);
+              const idx = State.polyList.findIndex((item) => GFMath.polyToInt(item.poly, 2) === targetVal);
+              if (idx !== -1) State.selectedPolyIdx = idx;
+            } else if (Array.isArray(preferredPoly)) {
+              const idx = State.polyList.findIndex((item) => GFMath.equals(item.poly, preferredPoly));
+              if (idx !== -1) State.selectedPolyIdx = idx;
+            }
+          }
+
+          const sel = $('polySelect');
+          sel.innerHTML = '';
+          State.polyList.forEach((item, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            let label = Format.polyPlain(item.poly);
+            if (p === 2) label += `  [${Format.hexStr(GFMath.polyToInt(item.poly, 2), n + 1)}]`;
+            if (item.isPrimitive === true) label += '  [本原多項式 Primitive]';
+            else if (item.isPrimitive === false) label += '  [僅不可約 Irreducible]';
+            if (item.tag) label += ` ★ ${item.tag}`;
+            opt.textContent = label;
+            sel.appendChild(opt);
+          });
+          sel.value = State.selectedPolyIdx;
+
+          const chosen = State.polyList[State.selectedPolyIdx];
+          State.customCoeffs = chosen ? [...chosen.poly] : new Array(n + 1).fill(0);
+          while (State.customCoeffs.length <= n) State.customCoeffs.push(0);
+          State.customCoeffs[n] = 1;
+
+          renderCustomPolyInputs();
+          applyPolyModeUI();
+        }
+
+        // 調整元素 A, B
+        if (!keepInitialAB) {
+          State.elemA = normalizeElem(State.elemA, n, p);
+          State.elemB = normalizeElem(State.elemB, n, p);
+          if (State.elemA.every((v) => v === 0) && State.elemB.every((v) => v === 0)) {
+            if (n === 1) {
+              State.elemA[0] = Math.min(2, p - 1);
+              State.elemB[0] = Math.min(3, p - 1);
+            } else {
+              State.elemA[Math.min(1, n - 1)] = 1;
+              State.elemB[0] = 1;
+              State.elemB[Math.min(2, n - 1)] = 1;
+            }
+          }
+        }
+
+        buildElementInputs('A');
+        buildElementInputs('B');
+        syncElementDisplays('A');
+        syncElementDisplays('B');
+
+        resetTableFilters(false);
+        onPolynomialChanged();
+      }
+
+      function applyPolyModeUI() {
+        if (State.n === 1) return;
+        const isList = State.polyMode === 'list';
+        $('polyListPanel').classList.toggle('hidden', !isList);
+        $('polyCustomPanel').classList.toggle('hidden', isList);
+        $('btnPolyList').classList.toggle('active', isList);
+        $('btnPolyCustom').classList.toggle('active', !isList);
+        $('customPolyHexRow').classList.toggle('hidden', State.p !== 2);
+      }
+
+      function renderCustomPolyInputs() {
+        const container = $('customPolyInputs');
+        container.innerHTML = '';
+        const { p, n } = State;
+
+        for (let i = n; i >= 0; i--) {
+          const term = document.createElement('div');
+          term.className = 'custom-term';
+
+          const inp = document.createElement('input');
+          inp.type = 'number';
+          inp.min = 0;
+          inp.max = p - 1;
+          inp.value = State.customCoeffs[i] || 0;
+          inp.dataset.deg = i;
+          inp.addEventListener('input', () => {
+            let v = parseInt(inp.value, 10);
+            if (isNaN(v)) v = 0;
+            State.customCoeffs[i] = GFMath.mod(v, p);
+            if (p === 2) {
+              $('customPolyHex').value = GFMath.polyToInt(State.customCoeffs, 2).toString(16).toUpperCase();
+            }
+            onPolynomialChanged();
+          });
+
+          term.appendChild(inp);
+          if (i > 0) {
+            const lbl = document.createElement('span');
+            lbl.innerHTML = i === 1 ? 'x +' : `x<sup>${i}</sup> +`;
+            term.appendChild(lbl);
+          }
+          container.appendChild(term);
+        }
+
+        if (p === 2) {
+          $('customPolyHex').value = GFMath.polyToInt(State.customCoeffs, 2).toString(16).toUpperCase();
+        }
+      }
+
+      function onPolynomialChanged() {
+        const { p, n } = State;
+
+        if (n > 1) {
+          if (State.polyMode === 'list') {
+            const item = State.polyList[State.selectedPolyIdx];
+            if (item) {
+              State.mPoly = item.poly;
+              State.mValid = true;
+              State.mIsPrimitive = item.isPrimitive;
+
+              const primBadge = item.isPrimitive === true
+                ? `<span class="badge badge-emerald">✓ 本原多項式（x 即為產生器）</span>`
+                : item.isPrimitive === false
+                ? `<span class="badge badge-amber">✓ 不可約（非本原多項式）</span>`
+                : `<span class="badge badge-cyan">✓ 不可約多項式</span>`;
+
+              const codeStr = p === 2
+                ? `Hex: <strong style="color:var(--text-primary)">${Format.hexStr(GFMath.polyToInt(item.poly, 2), n + 1)}</strong> · Dec: <strong style="color:var(--text-primary)">${GFMath.polyToInt(item.poly, 2)}</strong>`
+                : `係數向量: <strong style="color:var(--text-primary)">${Format.vectorStr(item.poly, n + 1)}</strong>`;
+
+              $('polySelectedInfo').className = 'info-box';
+              $('polySelectedInfo').innerHTML = `
+                <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+                  <div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px;">
+                    <span class="mono poly-expr" style="color:var(--cyan); font-weight:700;">m(x) = ${Format.polyHTML(item.poly)}</span>
+                    ${primBadge}
+                  </div>
+                  <span class="mono" style="font-size:12px;">${codeStr}</span>
+                </div>
+              `;
+            }
+          } else {
+            const trimmed = GFMath.trim(State.customCoeffs, p);
+            const deg = GFMath.deg(trimmed);
+            const box = $('customPolyValidation');
+
+            if (deg !== n) {
+              State.mValid = false;
+              box.className = 'info-box err';
+              box.innerHTML = `✕ 最高次項 <span class="mono">x<sup>${n}</sup></span> 的係數不可為 0（目前次數為 ${deg < 0 ? '無' : deg}）。`;
+            } else if (!GFMath.isIrreducible(trimmed, p)) {
+              State.mValid = false;
+              const { lc, factors } = GFMath.factorCompletely(trimmed, p);
+              const facStr = (lc > 1 ? `${lc} · ` : '') + factors.map((f) => `(${Format.polyHTML(f)})`).join(' · ');
+              box.className = 'info-box err';
+              box.innerHTML = `
+                <div>✕ 此多項式在 <span class="mono">GF(${p})</span> 上為<strong>可約多項式 (Reducible)</strong>，無法構成有限體！</div>
+                <div class="mono poly-expr" style="margin-top:5px; color:#fecdd3;">因式分解：m(x) = ${facStr}</div>
+              `;
+            } else {
+              State.mPoly = GFMath.makeMonic(trimmed, p);
+              State.mValid = true;
+              State.mIsPrimitive = GFMath.isPrimitivePolynomial(State.mPoly, p, n);
+              const primNote = State.mIsPrimitive === true
+                ? '（同時是<strong>本原多項式</strong>，x 可直接作產生器）'
+                : State.mIsPrimitive === false
+                ? '（<strong>僅不可約、非本原</strong>，仍可構成有限體，系統已自動尋找最小本原元作為產生器 g）'
+                : '';
+              box.className = 'info-box ok';
+              box.innerHTML = `✓ 驗證通過：<span class="mono poly-expr" style="font-weight:700;">${Format.polyHTML(State.mPoly)}</span> 為不可約多項式 ${primNote}`;
+            }
+          }
+        }
+
+        // 建立 Exp/Log 查表 (p^n <= 2048)
+        const genBanner = $('generatorBanner');
+        const sizeBig = BigInt(p) ** BigInt(n);
+        if (State.mValid && sizeBig <= BigInt(MAX_TABLE_SIZE)) {
+          State.expLog = GFMath.buildExpLogTables(p, n, State.mPoly);
+        } else {
+          State.expLog = null;
+        }
+
+        if (!State.mValid) {
+          genBanner.className = 'info-box hidden';
+        } else if (State.expLog) {
+          const { generator, generatorInt, xIsPrimitive, xOrder, order } = State.expLog;
+          genBanner.className = 'info-box';
+          if (n === 1) {
+            genBanner.innerHTML = `乘法群最小產生器：<span class="mono" style="color:var(--amber); font-weight:700;">g = ${generatorInt}</span>（循環週期 ${order}，已建立完整 Exp/Log 表）`;
+          } else if (xIsPrimitive) {
+            genBanner.innerHTML = `
+              <div>乘法群產生器：<span class="mono poly-expr" style="color:var(--amber); font-weight:700;">g = ${Format.polyHTML(generator)}</span> <span class="mono">（值 ${generatorInt}）</span></div>
+              <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">x 的階數等於滿週期 ${order}，連乘 x 即可不重複走完所有非零元素。</div>
+            `;
+          } else {
+            genBanner.innerHTML = `
+              <div>自動選用最小本原元：<span class="mono poly-expr" style="color:var(--amber); font-weight:700;">g = ${Format.polyHTML(generator)}</span> <span class="mono">（值 ${generatorInt}，階數 ${order}）</span></div>
+              <div style="font-size:11.5px; color:var(--amber); margin-top:3px;">說明：此多項式非本原，x 的階數僅為 ${xOrder}（&lt; ${order}）無法走完循環群，故改用最小產生器 g = ${Format.polyPlain(generator)} 建表。</div>
+            `;
+          }
+        } else {
+          genBanner.className = 'info-box';
+          genBanner.innerHTML = `階數超過 ${MAX_TABLE_SIZE}，四則運算與反元素改採精確多項式算術與擴展歐幾里得演算法即時求解。`;
+        }
+
+        buildCompleteTableData();
+        populateDynamicFilterOptions();
+        renderCalculations();
+        applyFiltersAndRenderTable();
+      }
+
+      /* =======================================================================
+         5. 區塊 2：元素 A / B 同步輸入元件
+         ======================================================================= */
+      function buildElementInputs(which) {
+        const { p, n } = State;
+        const container = $(`coeffInputs${which}`);
+        const arr = which === 'A' ? State.elemA : State.elemB;
+        const safeInt = isSafeIntField(p, n);
+
+        document.querySelectorAll('.maxCoeffLabel').forEach((el) => (el.textContent = p - 1));
+        $(`p2Sync${which}`).classList.toggle('hidden', p !== 2);
+        $(`pGt2Sync${which}`).classList.toggle('hidden', p === 2 || !safeInt);
+
+        container.innerHTML = '';
+        for (let i = n - 1; i >= 0; i--) {
+          const cell = document.createElement('div');
+          cell.className = 'coeff-cell';
+
+          const lbl = document.createElement('span');
+          lbl.innerHTML = i === 0 ? 'x<sup>0</sup>' : i === 1 ? 'x' : `x<sup>${i}</sup>`;
+
+          const inp = document.createElement('input');
+          inp.type = 'number';
+          inp.min = 0;
+          inp.max = p - 1;
+          inp.value = arr[i];
+          inp.dataset.idx = i;
+          inp.className = `coeff-box coeff-input-${which}${which === 'B' ? ' purple' : ''}`;
+
+          inp.addEventListener('input', () => {
+            let v = parseInt(inp.value, 10);
+            if (isNaN(v)) v = 0;
+            arr[i] = GFMath.mod(v, p);
+            syncElementDisplays(which, 'coeff');
+            renderCalculations();
+            applyFiltersAndRenderTable();
+          });
+
+          cell.appendChild(lbl);
+          cell.appendChild(inp);
+          container.appendChild(cell);
+        }
+      }
+
+      function syncElementDisplays(which, source = 'all') {
+        const { p, n } = State;
+        const arr = which === 'A' ? State.elemA : State.elemB;
+        const trimmed = GFMath.trim(arr, p);
+        const safeInt = isSafeIntField(p, n);
+        const intVal = safeInt ? GFMath.polyToInt(trimmed, p) : 0;
+
+        if (source !== 'coeff') {
+          document.querySelectorAll(`.coeff-input-${which}`).forEach((inp) => {
+            inp.value = arr[parseInt(inp.dataset.idx, 10)] || 0;
+          });
+        }
+
+        $(`vecLabel${which}`).textContent = Format.vectorStr(arr, n);
+        $(`polyPreview${which}`).innerHTML = Format.polyHTML(trimmed);
+
+        if (p === 2) {
+          if (source !== 'dec') $(`decInput${which}`).value = intVal;
+          if (source !== 'bin') $(`binInput${which}`).value = Format.binCompact(intVal, n);
+          if (source !== 'hex') $(`hexInput${which}`).value = intVal.toString(16).toUpperCase().padStart(Math.ceil(n / 4), '0');
+        } else if (safeInt) {
+          if (source !== 'baseP') $(`basePInput${which}`).value = intVal;
+        }
+      }
+
+      function bindSyncInputs(which) {
+        const maxVal = () => Number((BigInt(State.p) ** BigInt(State.n)) - 1n);
+
+        $(`decInput${which}`).addEventListener('input', (e) => {
+          if (State.p !== 2) return;
+          let v = parseInt(e.target.value, 10);
+          if (isNaN(v) || v < 0) v = 0;
+          if (v > maxVal()) v = maxVal();
+          const poly = GFMath.intToPoly(v, 2, State.n);
+          if (which === 'A') State.elemA = normalizeElem(poly, State.n, 2);
+          else State.elemB = normalizeElem(poly, State.n, 2);
+          syncElementDisplays(which, 'dec');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+
+        $(`binInput${which}`).addEventListener('input', (e) => {
+          if (State.p !== 2) return;
+          const clean = e.target.value.replace(/[^01]/g, '');
+          let v = clean ? parseInt(clean, 2) : 0;
+          if (v > maxVal()) v = v & maxVal();
+          const poly = GFMath.intToPoly(v, 2, State.n);
+          if (which === 'A') State.elemA = normalizeElem(poly, State.n, 2);
+          else State.elemB = normalizeElem(poly, State.n, 2);
+          syncElementDisplays(which, 'bin');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+
+        $(`hexInput${which}`).addEventListener('input', (e) => {
+          if (State.p !== 2) return;
+          const clean = e.target.value.replace(/^0x/i, '').replace(/[^0-9a-f]/gi, '');
+          let v = clean ? parseInt(clean, 16) : 0;
+          if (v > maxVal()) v = v & maxVal();
+          const poly = GFMath.intToPoly(v, 2, State.n);
+          if (which === 'A') State.elemA = normalizeElem(poly, State.n, 2);
+          else State.elemB = normalizeElem(poly, State.n, 2);
+          syncElementDisplays(which, 'hex');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+
+        $(`basePInput${which}`).addEventListener('input', (e) => {
+          if (State.p === 2 || !isSafeIntField(State.p, State.n)) return;
+          let v = parseInt(e.target.value, 10);
+          if (isNaN(v) || v < 0) v = 0;
+          if (v > maxVal()) v = maxVal();
+          const poly = GFMath.intToPoly(v, State.p, State.n);
+          if (which === 'A') State.elemA = normalizeElem(poly, State.n, State.p);
+          else State.elemB = normalizeElem(poly, State.n, State.p);
+          syncElementDisplays(which, 'baseP');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+      }
+
+      /* =======================================================================
+         6. 區塊 2 & 3：四則運算推導與反元素總覽渲染
+         ======================================================================= */
+      function renderCalculations() {
+        const { p, n, mPoly, mValid, op, expLog } = State;
+        const a = GFMath.trim(State.elemA, p);
+        const b = GFMath.trim(State.elemB, p);
+        const safeInt = isSafeIntField(p, n);
+        const aInt = safeInt ? GFMath.polyToInt(a, p) : null;
+        const bInt = safeInt ? GFMath.polyToInt(b, p) : null;
+
+        const hero = $('resultHero');
+        const stepsBox = $('stepsContainer');
+        const formulaHead = $('resultFormulaHeader');
+
+        if (!mValid) {
+          formulaHead.textContent = '';
+          hero.className = 'result-hero error';
+          hero.innerHTML = `<div style="color:var(--rose); font-weight:600;">請先在區塊 1 設定合法的質數 p、次數 n 與不可約多項式。</div>`;
+          stepsBox.innerHTML = '';
+          $('inverseCardA').innerHTML = `<div style="font-size:13px; color:var(--text-muted);">等待合法有限體參數...</div>`;
+          $('inverseCardB').innerHTML = `<div style="font-size:13px; color:var(--text-muted);">等待合法有限體參數...</div>`;
+          return;
+        }
+
+        const opSym = { add: '+', sub: '−', mul: '×', div: '÷' }[op];
+        formulaHead.innerHTML = `(${Format.polyHTML(a)}) ${opSym} (${Format.polyHTML(b)}) in GF(${p}<sup>${n}</sup>)`;
+
+        let resultPoly = null;
+        let errorMsg = null;
+        const steps = [];
+
+        if (op === 'add' || op === 'sub') {
+          resultPoly = op === 'add' ? GFMath.polyAdd(a, b, p) : GFMath.polySub(a, b, p);
+          const sign = op === 'add' ? '+' : '−';
+
+          if (p === 2) {
+            const resInt = GFMath.polyToInt(resultPoly, 2);
+            steps.push({
+              title: 'Step 1 · 係數逐位 XOR（特徵值 p = 2 時，加法與減法完全等價）',
+              cls: '',
+              body: `
+                <div>  A = <span style="color:var(--cyan)">${Format.binStr(aInt, n)}</span> (${aInt})</div>
+                <div>⊕ B = <span style="color:var(--purple-light)">${Format.binStr(bInt, n)}</span> (${bInt})</div>
+                <div style="border-top:1px solid var(--border-strong); margin-top:4px; padding-top:4px; color:var(--emerald); font-weight:700;">  R = ${Format.binStr(resInt, n)} (${resInt})</div>
+              `,
+            });
+          } else {
+            const items = [];
+            for (let i = n - 1; i >= 0; i--) {
+              const ca = State.elemA[i] || 0;
+              const cb = State.elemB[i] || 0;
+              const cr = op === 'add' ? GFMath.mod(ca + cb, p) : GFMath.mod(ca - cb, p);
+              const term = i === 0 ? 'x⁰' : i === 1 ? 'x¹' : `x^${i}`;
+              items.push(`<span style="display:inline-block; background:#111827; border:1px solid var(--border); border-radius:6px; padding:3px 8px; margin:2px 4px 2px 0;">${term}: (${ca} ${sign} ${cb}) mod ${p} = <b style="color:var(--emerald)">${cr}</b></span>`);
+            }
+            steps.push({
+              title: `Step 1 · 對應次項係數模 ${p} ${op === 'add' ? '相加' : '相減'}`,
+              cls: '',
+              body: items.join(''),
+            });
+          }
+
+          steps.push({
+            title: 'Step 2 · 組合結果多項式',
+            cls: 'emerald',
+            body: `<span class="poly-expr" style="color:var(--emerald); font-weight:700;">R(x) = ${Format.polyHTML(resultPoly)}</span>`,
+          });
+        } else if (op === 'mul') {
+          if (n === 1) {
+            const raw = a[0] * b[0];
+            const r = raw % p;
+            resultPoly = [r];
+            steps.push({
+              title: `視角 A · 整數乘法模 ${p}`,
+              cls: '',
+              body: `${a[0]} × ${b[0]} = ${raw} ≡ <b style="color:var(--emerald)">${r}</b> (mod ${p})`,
+            });
+          } else {
+            const rawProd = GFMath.polyMul(a, b, p);
+            const { q, r } = GFMath.polyDivMod(rawProd, mPoly, p);
+            resultPoly = r;
+            steps.push({
+              title: '視角 A · 多項式乘法展開與模 m(x) 降次',
+              cls: '',
+              body: `
+                <div class="poly-expr">1. 未取模乘積：A(x) · B(x) = <span style="color:var(--cyan)">${Format.polyHTML(rawProd)}</span></div>
+                <div class="poly-expr">2. 除以不可約多項式 m(x) = <span style="color:var(--text-primary)">${Format.polyHTML(mPoly)}</span></div>
+                <div class="poly-expr" style="color:var(--text-secondary);">   商式 q(x) = ${Format.polyHTML(q)}</div>
+                <div class="poly-expr" style="color:var(--emerald); font-weight:700;">3. 最終餘式：R(x) = ${Format.polyHTML(r)}</div>
+              `,
+            });
+          }
+
+          if (expLog) {
+            const { generator, generatorInt, order, logTable, expTable } = expLog;
+            if (aInt === 0 || bInt === 0) {
+              steps.push({
+                title: `視角 B · Exp/Log 查表法（產生器 g = ${Format.polyPlain(generator)}，週期 = ${order}）`,
+                cls: 'amber',
+                body: `輸入含有元素 <b style="color:var(--rose)">0</b>：觸發防呆 <span style="color:var(--amber)">if (a == 0 || b == 0) return 0;</span>，直接回傳 <b>0</b>（不進入查表）。`,
+              });
+            } else {
+              const la = logTable[aInt];
+              const lb = logTable[bInt];
+              const rawSum = la + lb;
+              const modSum = rawSum % order;
+              steps.push({
+                title: `視角 B · Exp/Log 查表法（產生器 g = ${Format.polyPlain(generator)} [值 ${generatorInt}]，週期 = ${order}）`,
+                cls: 'amber',
+                body: `
+                  <div>1. 查係數對應步數：log[${aInt}] = <b style="color:var(--cyan)">${la}</b> 步，log[${bInt}] = <b style="color:var(--purple-light)">${lb}</b> 步</div>
+                  <div>2. 步數相加取餘數：(${la} + ${lb}) % ${order} = ${rawSum} % ${order} = <b style="color:var(--amber)">${modSum}</b> 步</div>
+                  <div>3. 查回最終係數：exp[${modSum}] = <b style="color:var(--emerald)">${expTable[modSum]}</b>（即 <span class="poly-expr">${Format.polyHTML(resultPoly)}</span>）</div>
+                `,
+              });
+            }
+          }
+        } else if (op === 'div') {
+          if (GFMath.isZero(b)) {
+            errorMsg = '除數不可為 0（元素 0 在有限體中沒有乘法反元素）。';
+          } else {
+            const bInv = GFMath.fieldInv(b, mPoly, p, n);
+            const bInvInt = safeInt ? GFMath.polyToInt(bInv, p) : null;
+            const rawProd = n === 1 ? [a[0] * bInv[0]] : GFMath.polyMul(a, bInv, p);
+            resultPoly = n === 1 ? [(a[0] * bInv[0]) % p] : GFMath.polyMod(rawProd, mPoly, p);
+
+            steps.push({
+              title: '視角 A · 利用乘法反元素將除法轉為乘法（A ÷ B = A × B⁻¹）',
+              cls: '',
+              body: n === 1
+                ? `
+                  <div>1. 求除數反元素：${b[0]}⁻¹ ≡ <b style="color:var(--emerald)">${bInv[0]}</b> (mod ${p})</div>
+                  <div>2. 相乘取模：${a[0]} × ${bInv[0]} = ${a[0] * bInv[0]} ≡ <b style="color:var(--emerald)">${resultPoly[0]}</b> (mod ${p})</div>
+                `
+                : `
+                  <div class="poly-expr">1. 擴展歐幾里得求 B⁻¹(x) = <b style="color:var(--emerald)">${Format.polyHTML(bInv)}</b>${bInvInt !== null ? `（值 ${bInvInt}）` : ''}</div>
+                  <div class="poly-expr">2. 乘積展開：A(x) · B⁻¹(x) = ${Format.polyHTML(rawProd)}</div>
+                  <div class="poly-expr" style="color:var(--emerald); font-weight:700;">3. 模 m(x) 結果：R(x) = ${Format.polyHTML(resultPoly)}</div>
+                `,
+            });
+
+            if (expLog) {
+              const { generator, generatorInt, order, logTable, expTable } = expLog;
+              if (aInt === 0) {
+                steps.push({
+                  title: `視角 B · Exp/Log 查表法（產生器 g = ${Format.polyPlain(generator)}，週期 = ${order}）`,
+                  cls: 'amber',
+                  body: `被除數 A = <b style="color:var(--rose)">0</b>：觸發防呆直接回傳 <b>0</b>。`,
+                });
+              } else {
+                const la = logTable[aInt];
+                const lb = logTable[bInt];
+                const diffRaw = la - lb;
+                const diffSafe = (diffRaw + order) % order;
+                steps.push({
+                  title: `視角 B · Exp/Log 查表法（產生器 g = ${Format.polyPlain(generator)} [值 ${generatorInt}]，週期 = ${order}）`,
+                  cls: 'amber',
+                  body: `
+                    <div>1. 查步數：log[${aInt}] = <b style="color:var(--cyan)">${la}</b> 步，log[${bInt}] = <b style="color:var(--purple-light)">${lb}</b> 步</div>
+                    <div>2. 步數相減防負數：(${la} − ${lb} + ${order}) % ${order} = (${diffRaw} + ${order}) % ${order} = <b style="color:var(--amber)">${diffSafe}</b> 步</div>
+                    <div>3. 查回最終係數：exp[${diffSafe}] = <b style="color:var(--emerald)">${expTable[diffSafe]}</b>（即 <span class="poly-expr">${Format.polyHTML(resultPoly)}</span>）</div>
+                  `,
+                });
+              }
+            }
+          }
+        }
+
+        // 渲染結果摘要卡片
+        if (errorMsg) {
+          hero.className = 'result-hero error';
+          hero.innerHTML = `<div style="color:var(--rose); font-weight:700; font-size:14px;">⚠ ${errorMsg}</div>`;
+        } else {
+          const resInt = safeInt ? GFMath.polyToInt(resultPoly, p) : null;
+          const resLog = expLog && resInt !== null ? (resInt === 0 ? '— (0)' : `g^${expLog.logTable[resInt]}`) : null;
+          hero.className = 'result-hero';
+
+          const chips = [];
+          if (resInt !== null) {
+            chips.push(`<div class="metric-chip"><div class="k">${p === 2 ? '十進位 (Dec)' : `Dec (Base-${p})`}</div><div class="v">${resInt}</div></div>`);
+          }
+          if (p === 2 && resInt !== null) {
+            chips.push(`<div class="metric-chip"><div class="k">十六進位 (Hex)</div><div class="v" style="color:var(--emerald)">${Format.hexStr(resInt, n)}</div></div>`);
+            chips.push(`<div class="metric-chip"><div class="k">二進位 (Bin)</div><div class="v" style="color:var(--cyan)">${Format.binStr(resInt, n)}</div></div>`);
+          } else {
+            chips.push(`<div class="metric-chip"><div class="k">Base-${p} 係數向量</div><div class="v" style="color:var(--cyan)">${Format.vectorStr(resultPoly, n)}</div></div>`);
+          }
+          if (resLog !== null) {
+            chips.push(`<div class="metric-chip"><div class="k">Log 步數</div><div class="v" style="color:var(--amber)">${resLog}</div></div>`);
+          }
+
+          hero.innerHTML = `
+            <div>
+              <div style="font-size:12px; color:var(--text-secondary); margin-bottom:4px;">運算結果 R(x)</div>
+              <div class="result-poly poly-expr">${Format.polyHTML(resultPoly)}</div>
+            </div>
+            <div class="metric-chips">${chips.join('')}</div>
+          `;
+        }
+
+        stepsBox.innerHTML = steps
+          .map(
+            (s) => `
+            <div class="step-item">
+              <div class="step-item-title ${s.cls}">${s.title}</div>
+              <div class="step-item-body">${s.body}</div>
+            </div>
+          `
+          )
+          .join('');
+
+        renderInverseCard('A', a);
+        renderInverseCard('B', b);
+      }
+
+      function renderInverseCard(which, poly) {
+        const { p, n, mPoly, expLog } = State;
+        const card = $(`inverseCard${which}`);
+        const badgeCls = which === 'A' ? 'step-cyan' : 'step-purple';
+        const safeInt = isSafeIntField(p, n);
+
+        const valInt = safeInt ? GFMath.polyToInt(poly, p) : null;
+        const addInv = GFMath.polyNeg(poly, p);
+        const addInvInt = safeInt ? GFMath.polyToInt(addInv, p) : null;
+        const mulInv = GFMath.fieldInv(poly, mPoly, p, n);
+        const mulInvInt = mulInv && safeInt ? GFMath.polyToInt(mulInv, p) : null;
+
+        const repr = (pl, v) => {
+          if (p === 2 && v !== null) return `Dec: ${v} · Hex: ${Format.hexStr(v, n)} · Bin: ${Format.binStr(v, n)}`;
+          return `${v !== null ? `Dec: ${v} · ` : ''}向量: ${Format.vectorStr(pl, n)}`;
+        };
+
+        let mulExtraHTML = '';
+        if (mulInv) {
+          const notes = [];
+          if (expLog && valInt !== null && valInt !== 0) {
+            const { order, logTable } = expLog;
+            const step = logTable[valInt];
+            const invStep = order - step;
+            notes.push(`<div style="color:var(--amber);">Exp/Log 步數：exp[${order} − log[${valInt}]] = exp[${order} − ${step}] = exp[${invStep}] = <b>${mulInvInt}</b></div>`);
+          }
+          if (n > 1) {
+            const { x, y } = GFMath.polyExtGcd(poly, mPoly, p);
+            notes.push(`<div class="poly-expr" style="color:var(--text-secondary);">貝祖等式：(${Format.polyHTML(poly)})·(${Format.polyHTML(x)}) + m(x)·(${Format.polyHTML(y)}) = 1</div>`);
+          }
+          if (notes.length) {
+            mulExtraHTML = `<div class="mono" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(52,211,153,0.18); font-size:11.5px; line-height:1.6;">${notes.join('')}</div>`;
+          }
+        }
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span class="step-badge ${badgeCls}" style="width:24px; height:24px; font-size:12px;">${which}</span>
+              <h3 style="margin:0; font-size:14.5px; font-weight:700;">元素 ${which} 的反元素</h3>
+            </div>
+            <span class="mono poly-expr" style="font-size:12px; color:var(--text-secondary);">${which} = ${Format.polyHTML(poly)}${valInt !== null ? ` (${valInt})` : ''}</span>
+          </div>
+
+          <div class="inv-box add">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <span style="font-size:12px; font-weight:700; color:var(--amber);">加法反元素 (−${which})</span>
+              <span class="mono" style="font-size:11px; color:var(--amber);">驗算：${which} + (−${which}) = 0</span>
+            </div>
+            <div class="mono poly-expr" style="font-size:16px; font-weight:700;">${Format.polyHTML(addInv)}</div>
+            <div class="mono" style="font-size:11.5px; color:var(--text-secondary); margin-top:4px;">${repr(addInv, addInvInt)}</div>
+          </div>
+
+          <div class="inv-box ${mulInv ? 'mul' : 'none'}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+              <span style="font-size:12px; font-weight:700; color:${mulInv ? 'var(--emerald)' : 'var(--rose)'};">乘法反元素 (${which}⁻¹)</span>
+              <span class="mono" style="font-size:11px; color:${mulInv ? 'var(--emerald)' : 'var(--rose)'};">
+                ${mulInv ? `驗算：${which} × ${which}⁻¹ = 1` : '不可逆'}
+              </span>
+            </div>
+            ${
+              mulInv
+                ? `
+                  <div class="mono poly-expr" style="font-size:16px; font-weight:700;">${Format.polyHTML(mulInv)}</div>
+                  <div class="mono" style="font-size:11.5px; color:var(--text-secondary); margin-top:4px;">${repr(mulInv, mulInvInt)}</div>
+                  ${mulExtraHTML}
+                `
+                : `<div style="font-size:13.5px; font-weight:600; color:var(--rose);">無（0 無乘法反元素）</div>`
+            }
+          </div>
+        `;
+      }
+
+      /* =======================================================================
+         7. 區塊 4：完整元素總表建置、頂部進位制解析與多條件篩選
+         ======================================================================= */
+      function buildCompleteTableData() {
+        const { p, n, mPoly, mValid, expLog } = State;
+        const sizeBig = BigInt(p) ** BigInt(n);
+        State.tableData = [];
+
+        if (!mValid || sizeBig > BigInt(MAX_TABLE_SIZE)) return;
+
+        const size = Number(sizeBig);
+        const groupOrder = size - 1;
+        const bitLen = p === 2 ? n : Math.max(1, (size - 1).toString(2).length);
+        const data = new Array(size);
+
+        for (let v = 0; v < size; v++) {
+          const poly = GFMath.intToPoly(v, p, n);
+          const deg = GFMath.deg(poly);
+          const weight = GFMath.weight(poly);
+
+          const addInvPoly = GFMath.polyNeg(poly, p);
+          const addInv = GFMath.polyToInt(addInvPoly, p);
+
+          let mulInv = null;
+          let mulInvPoly = null;
+          let logStep = null;
+          let order = null;
+
+          if (v !== 0) {
+            if (expLog) {
+              logStep = expLog.logTable[v];
+              const invStep = (groupOrder - logStep) % groupOrder;
+              mulInv = expLog.expTable[invStep];
+              mulInvPoly = GFMath.intToPoly(mulInv, p, n);
+              order = groupOrder / GFMath.gcdInt(groupOrder, logStep);
+            } else {
+              mulInvPoly = GFMath.fieldInv(poly, mPoly, p, n);
+              mulInv = mulInvPoly ? GFMath.polyToInt(mulInvPoly, p) : null;
+            }
+          }
+
+          const binCompact = Format.binCompact(v, bitLen);
+          const binSpaced = Format.binStr(v, bitLen);
+          const octStr = v.toString(8);
+          const hex = Format.hexStr(v, bitLen);
+          const vec = Format.vectorStr(poly, n);
+          const basePStr = Format.basePStr(poly, p, n);
+          const polyHTML = Format.polyHTML(poly);
+          const polyPlain = Format.polyPlain(poly);
+          const polyAscii = Format.polyAscii(poly);
+          const addInvHTML = Format.polyHTML(addInvPoly);
+          const addInvPlain = Format.polyPlain(addInvPoly);
+          const mulInvHTML = mulInvPoly ? Format.polyHTML(mulInvPoly) : '';
+          const mulInvPlain = mulInvPoly ? Format.polyPlain(mulInvPoly) : '';
+          const mulInvHex = mulInv !== null ? Format.hexStr(mulInv, bitLen) : '';
+
+          const searchBlob = [
+            String(v),
+            octStr,
+            hex,
+            hex.replace(/^0x/i, ''),
+            binCompact,
+            binSpaced,
+            vec,
+            basePStr,
+            polyPlain,
+            polyAscii,
+            polyPlain.replace(/\s+/g, ''),
+            String(addInv),
+            addInvPlain,
+            mulInv !== null ? String(mulInv) : '無',
+            mulInvHex,
+            mulInvPlain,
+            logStep !== null ? `g^${logStep} ${logStep}` : '',
+          ]
+            .join(' ')
+            .toLowerCase();
+
+          data[v] = {
+            dec: v,
+            poly,
+            deg,
+            weight,
+            bitLen,
+            binCompact,
+            binSpaced,
+            octStr,
+            hex,
+            vec,
+            basePStr,
+            polyHTML,
+            polyPlain,
+            polyAscii,
+            polyAsciiLower: polyAscii.toLowerCase(),
+            polyPlainCompact: polyPlain.replace(/\s+/g, '').toLowerCase(),
+            addInv,
+            addInvHTML,
+            addInvPlain,
+            mulInv,
+            mulInvHTML,
+            mulInvPlain,
+            mulInvHex,
+            logStep,
+            order,
+            isPrimitive: order !== null && order === groupOrder,
+            searchBlob,
+          };
+        }
+
+        State.tableData = data;
+      }
+
+      function populateDynamicFilterOptions() {
+        const { p, n, tableData } = State;
+        const degSel = $('filterDegree');
+        const ordSel = $('filterOrder');
+        const wSel = $('filterWeight');
+
+        $('filterWeightLabel').textContent = p === 2 ? '非零項數 / 漢明權重 (Popcount)' : '多項式非零項數';
+
+        degSel.innerHTML = `<option value="all">全部次方</option><option value="-1">無 (0)</option>`;
+        for (let d = 0; d < n; d++) {
+          degSel.innerHTML += `<option value="${d}">${d} 次 (${d === 0 ? '常數' : d === 1 ? 'x' : 'x^' + d})</option>`;
+        }
+        degSel.value = State.filters.degree;
+
+        wSel.innerHTML = `<option value="all">全部項數</option>`;
+        for (let w = 0; w <= n; w++) {
+          wSel.innerHTML += `<option value="${w}">${w} 項${p === 2 ? ` (Weight = ${w})` : ''}</option>`;
+        }
+        wSel.value = State.filters.weight;
+
+        const groupOrder = tableData.length > 0 ? tableData.length - 1 : 0;
+        const ordSet = new Set();
+        tableData.forEach((row) => {
+          if (row.order !== null) ordSet.add(row.order);
+        });
+        const orders = Array.from(ordSet).sort((a, b) => b - a);
+
+        ordSel.innerHTML = `<option value="all">全部階數</option>`;
+        orders.forEach((o) => {
+          const tag = o === groupOrder ? ' ★ 本原元' : '';
+          ordSel.innerHTML += `<option value="${o}">Order = ${o}${tag}</option>`;
+        });
+        ordSel.innerHTML += `<option value="none">0（元素 0）</option>`;
+        ordSel.value = State.filters.order;
+      }
+
+      function updateSearchPlaceholder() {
+        const mode = State.filters.radixMode;
+        const { p } = State;
+        const map = {
+          all: '綜合搜尋：十進位 (29)、Hex (0x1D / 1D)、二進位 (00011101)、多項式 (x^4+x^3)、反元素或步數 (g^8)...',
+          bin: '二進位搜尋：單一值 (11101)、範圍 (100-1000)、多筆 (100, 11101) 或萬用字元 (110*)...',
+          oct: '八進位搜尋：單一值 (35 / 0o35)、範圍 (10-37) 或逗號多筆 (4, 35, 107)...',
+          dec: '十進位搜尋：單一值 (29)、範圍 (10-30) 或逗號多筆 (4, 29, 71)...',
+          hex: '十六進位搜尋：單一值 (1D / 0x1D)、範圍 (10-1F) 或逗號多筆 (04, 1D, 47)...',
+          basep: `${p} 進位係數搜尋：輸入 Base-${p} 數字（如 ${p === 2 ? '11101' : '12'}）、範圍或逗號多筆...`,
+          poly: '多項式搜尋：輸入多項式關鍵字，例如 x^4+x^3、x^2+1 或 x^7...',
+        };
+        $('filterGeneral').placeholder = map[mode] || map.all;
+      }
+
+      // 將上標數字還原為 ^數字，方便使用者直接貼上 x⁴+x³ 搜尋
+      function normalizePolyQuery(str) {
+        const supToNorm = { '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9' };
+        let out = '';
+        let inSup = false;
+        for (const ch of str) {
+          if (supToNorm[ch] !== undefined) {
+            if (!inSup) {
+              out += '^';
+              inSup = true;
+            }
+            out += supToNorm[ch];
+          } else {
+            inSup = false;
+            out += ch;
+          }
+        }
+        return out.replace(/\s+/g, '').toLowerCase();
+      }
+
+      // 驗證並解析單一進位數值字串
+      function parseRadixNumber(str, base) {
+        let s = str.replace(/\s+/g, '');
+        if (!s) return NaN;
+        if (base === 2) s = s.replace(/^0b/i, '');
+        else if (base === 8) s = s.replace(/^0o/i, '');
+        else if (base === 16) s = s.replace(/^0x/i, '');
+        if (!s) return NaN;
+
+        const digits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        if (base <= 36) {
+          const upper = s.toUpperCase();
+          let val = 0;
+          for (let i = 0; i < upper.length; i++) {
+            const idx = digits.indexOf(upper[i]);
+            if (idx === -1 || idx >= base) return NaN;
+            val = val * base + idx;
+          }
+          return val;
+        } else {
+          // 超過 36 進位使用冒號分隔 (例如 12:35)
+          const parts = s.split(':');
+          let val = 0;
+          for (const part of parts) {
+            if (!/^\d+$/.test(part)) return NaN;
+            const d = parseInt(part, 10);
+            if (d < 0 || d >= base) return NaN;
+            val = val * base + d;
+          }
+          return val;
+        }
+      }
+
+      // 頂部進位制搜尋列核心解析器 (含即時換算與格式防呆)
+      function evaluateTopSearch(rawInput, mode, p, n, tableSize) {
+        const trimmed = rawInput.trim();
+        if (!trimmed) {
+          return { empty: true, valid: true, badgeText: '', badgeType: 'none', matcher: () => true };
+        }
+
+        const maxVal = Math.max(0, tableSize - 1);
+        const bitLen = p === 2 ? n : Math.max(1, maxVal.toString(2).length);
+
+        if (mode === 'all') {
+          const qLower = trimmed.toLowerCase();
+          const qNorm = normalizePolyQuery(trimmed);
+          return {
+            empty: false,
+            valid: true,
+            badgeText: '',
+            badgeType: 'none',
+            matcher: (row) =>
+              row.searchBlob.includes(qLower) ||
+              row.polyAsciiLower.includes(qNorm) ||
+              row.polyPlainCompact.includes(qLower.replace(/\s+/g, '')),
+          };
+        }
+
+        if (mode === 'poly') {
+          const qNorm = normalizePolyQuery(trimmed);
+          const qCompact = trimmed.replace(/\s+/g, '').toLowerCase();
+          return {
+            empty: false,
+            valid: true,
+            badgeText: `多項式比對`,
+            badgeType: 'info',
+            matcher: (row) => row.polyAsciiLower.includes(qNorm) || row.polyPlainCompact.includes(qCompact),
+          };
+        }
+
+        const baseMap = { bin: 2, oct: 8, dec: 10, hex: 16, basep: p };
+        const base = baseMap[mode];
+        const rawTokens = trimmed.split(/[,，]+/).map((t) => t.trim()).filter((t) => t.length > 0);
+        if (rawTokens.length === 0) {
+          return { empty: true, valid: true, badgeText: '', badgeType: 'none', matcher: () => true };
+        }
+
+        const predicates = [];
+        let singleVal = null;
+        let singleRange = null;
+        let hasWildcard = false;
+
+        for (const tok of rawTokens) {
+          // 1. 二進位萬用字元 (*)
+          if (mode === 'bin' && tok.includes('*')) {
+            const clean = tok.replace(/\s+/g, '').replace(/^0b/i, '');
+            if (!/^[01*]+$/.test(clean)) {
+              return { empty: false, valid: false, badgeText: '格式無效', badgeType: 'error', matcher: () => false };
+            }
+            const regex = new RegExp('^' + clean.replace(/\*/g, '.*') + '$');
+            predicates.push((row) => regex.test(row.binCompact) || regex.test(row.dec.toString(2)));
+            hasWildcard = true;
+            continue;
+          }
+
+          // 2. 範圍查詢 (例如 10-1F、100~1000)
+          const rangeParts = tok.split(/[-~～]/);
+          if (rangeParts.length === 2 && rangeParts[0].trim() !== '' && rangeParts[1].trim() !== '') {
+            const v1 = parseRadixNumber(rangeParts[0], base);
+            const v2 = parseRadixNumber(rangeParts[1], base);
+            if (isNaN(v1) || isNaN(v2)) {
+              return { empty: false, valid: false, badgeText: '格式無效', badgeType: 'error', matcher: () => false };
+            }
+            const lo = Math.min(v1, v2);
+            const hi = Math.max(v1, v2);
+            predicates.push((row) => row.dec >= lo && row.dec <= hi);
+            if (rawTokens.length === 1) singleRange = [lo, hi];
+            continue;
+          } else if (rangeParts.length > 2) {
+            return { empty: false, valid: false, badgeText: '格式無效', badgeType: 'error', matcher: () => false };
+          }
+
+          // 3. 單一數值
+          const val = parseRadixNumber(tok, base);
+          if (isNaN(val)) {
+            return { empty: false, valid: false, badgeText: '格式無效', badgeType: 'error', matcher: () => false };
+          }
+          predicates.push((row) => row.dec === val);
+          if (rawTokens.length === 1) singleVal = val;
+        }
+
+        // 組裝即時進位換算徽章文字
+        let badgeText = '';
+        let badgeType = 'info';
+
+        if (singleVal !== null) {
+          const outOfRange = singleVal > maxVal;
+          const binTxt = singleVal.toString(2).padStart(bitLen, '0');
+          const hexTxt = Format.hexStr(singleVal, bitLen);
+          if (mode === 'hex') {
+            badgeText = `= Dec ${singleVal} · Bin ${binTxt}`;
+          } else if (mode === 'bin') {
+            badgeText = `= Dec ${singleVal} · Hex ${hexTxt}`;
+          } else if (mode === 'oct') {
+            badgeText = `= Dec ${singleVal} · Hex ${hexTxt}`;
+          } else if (mode === 'dec') {
+            badgeText = p === 2 ? `= Hex ${hexTxt} · Bin ${binTxt}` : `= Base-${p} ${Format.basePStr(GFMath.intToPoly(singleVal, p, n), p, n)}`;
+          } else if (mode === 'basep') {
+            badgeText = `= Dec ${singleVal}${p === 2 ? ` · Hex ${hexTxt}` : ''}`;
+          }
+          if (outOfRange) {
+            badgeText += ` (超出 0~${maxVal})`;
+            badgeType = 'warn';
+          }
+        } else if (singleRange !== null) {
+          badgeText = `範圍 Dec ${singleRange[0]} ~ ${singleRange[1]}`;
+        } else if (hasWildcard && rawTokens.length === 1) {
+          badgeText = `二進位萬用字元比對`;
+        } else {
+          badgeText = `多筆條件 (${rawTokens.length} 項)`;
+        }
+
+        return {
+          empty: false,
+          valid: true,
+          badgeText,
+          badgeType,
+          matcher: (row) => predicates.some((fn) => fn(row)),
+        };
+      }
+
+      // 解析 Log 步數篩選 (8, 0-15, >=200, <=10)
+      function matchLogFilter(logStep, rawInput) {
+        const s = rawInput.trim();
+        if (!s) return true;
+        if (logStep === null) return false;
+
+        const rangeMatch = s.match(/^(\d+)\s*[-~～]\s*(\d+)$/);
+        if (rangeMatch) {
+          const lo = parseInt(rangeMatch[1], 10);
+          const hi = parseInt(rangeMatch[2], 10);
+          return logStep >= Math.min(lo, hi) && logStep <= Math.max(lo, hi);
+        }
+
+        const cmpMatch = s.match(/^(>=|<=|>|<|=)\s*(\d+)$/);
+        if (cmpMatch) {
+          const op = cmpMatch[1];
+          const num = parseInt(cmpMatch[2], 10);
+          if (op === '>=') return logStep >= num;
+          if (op === '<=') return logStep <= num;
+          if (op === '>') return logStep > num;
+          if (op === '<') return logStep < num;
+          return logStep === num;
+        }
+
+        const exact = s.replace(/^g\^?/i, '');
+        if (/^\d+$/.test(exact)) return logStep === parseInt(exact, 10);
+        return false;
+      }
+
+      function parseFlexibleInt(raw) {
+        const s = raw.trim();
+        if (!s) return null;
+        if (/^0x[0-9a-f]+$/i.test(s)) return parseInt(s, 16);
+        if (/^\d+$/.test(s)) return parseInt(s, 10);
+        if (State.p === 2 && /^[0-9a-f]+$/i.test(s)) return parseInt(s, 16);
+        return NaN;
+      }
+
+      function applyFiltersAndRenderTable() {
+        const { p, n, mValid, expLog, tableData, filters, quickChip, sortKey, sortDir } = State;
+        const sizeBig = GFMath.isPrime(p) && n >= 1 && n <= 12 ? BigInt(p) ** BigInt(n) : 0n;
+
+        const largeNotice = $('tableTooLargeNotice');
+        const area = $('tableInteractiveArea');
+        const countBadge = $('tableCountBadge');
+        const genSummary = $('tableGenSummary');
+
+        if (!mValid) {
+          largeNotice.classList.remove('hidden');
+          largeNotice.textContent = '請先在區塊 1 設定合法的有限體參數與不可約多項式。';
+          area.classList.add('hidden');
+          countBadge.textContent = '0 筆';
+          genSummary.textContent = '';
+          return;
+        }
+
+        if (sizeBig > BigInt(MAX_TABLE_SIZE)) {
+          largeNotice.classList.remove('hidden');
+          largeNotice.innerHTML = `目前有限體 <span class="mono">GF(${p}<sup>${n}</sup>)</span> 共有 <strong class="mono">${sizeBig.toString()}</strong> 個元素，超過完整元素總表顯示上限（${MAX_TABLE_SIZE} 筆）。上方的四則運算與反元素計算仍可正常使用！`;
+          area.classList.add('hidden');
+          countBadge.textContent = `階數 > ${MAX_TABLE_SIZE}`;
+          genSummary.textContent = '';
+          return;
+        }
+
+        const size = Number(sizeBig);
+        largeNotice.classList.add('hidden');
+        area.classList.remove('hidden');
+
+        if (expLog) {
+          genSummary.innerHTML = `已完整載入全部 <strong>${size}</strong> 個元素（無截斷）· 產生器 <span class="mono poly-expr" style="color:var(--amber); font-weight:700;">g = ${Format.polyHTML(expLog.generator)}</span>（值 ${expLog.generatorInt}，循環週期 ${expLog.order}）`;
+        } else {
+          genSummary.innerHTML = `已完整載入全部 <strong>${size}</strong> 個元素（無截斷）`;
+        }
+
+        // 評估頂部進位制搜尋並更新即時換算/驗證徽章
+        const topEval = evaluateTopSearch(filters.general, filters.radixMode, p, n, size);
+        const searchBox = $('compositeSearchBox');
+        const liveBadge = $('searchLiveBadge');
+
+        searchBox.classList.toggle('is-invalid', !topEval.valid);
+        if (topEval.badgeType === 'none' || !topEval.badgeText) {
+          liveBadge.className = 'search-live-badge hidden';
+          liveBadge.textContent = '';
+        } else {
+          liveBadge.className = `search-live-badge ${topEval.badgeType}`;
+          liveBadge.textContent = topEval.badgeText;
+        }
+
+        // 當前 A / B 與其反元素集合
+        const aVal = GFMath.polyToInt(GFMath.trim(State.elemA, p), p);
+        const bVal = GFMath.polyToInt(GFMath.trim(State.elemB, p), p);
+        const abRelated = new Set([aVal, bVal]);
+        if (tableData[aVal]) {
+          abRelated.add(tableData[aVal].addInv);
+          if (tableData[aVal].mulInv !== null) abRelated.add(tableData[aVal].mulInv);
+        }
+        if (tableData[bVal]) {
+          abRelated.add(tableData[bVal].addInv);
+          if (tableData[bVal].mulInv !== null) abRelated.add(tableData[bVal].mulInv);
+        }
+
+        const decMin = filters.decMin !== '' ? parseInt(filters.decMin, 10) : null;
+        const decMax = filters.decMax !== '' ? parseInt(filters.decMax, 10) : null;
+        const mulInvTarget = parseFlexibleInt(filters.mulInv);
+
+        const matched = tableData.filter((row) => {
+          // 1. 快捷標籤
+          if (quickChip === 'primitive' && !row.isPrimitive) return false;
+          if (quickChip === 'selfMulInv' && (row.mulInv === null || row.mulInv !== row.dec)) return false;
+          if (quickChip === 'selfAddInv' && row.addInv !== row.dec) return false;
+          if (quickChip === 'abOnly' && !abRelated.has(row.dec)) return false;
+
+          // 2. 頂部進位制搜尋
+          if (!topEval.empty && !topEval.matcher(row)) return false;
+
+          // 3. 十進位範圍
+          if (decMin !== null && !isNaN(decMin) && row.dec < decMin) return false;
+          if (decMax !== null && !isNaN(decMax) && row.dec > decMax) return false;
+
+          // 4. Log 步數
+          if (filters.logStep.trim() !== '' && !matchLogFilter(row.logStep, filters.logStep)) return false;
+
+          // 5. 指定乘法反元素
+          if (mulInvTarget !== null) {
+            if (isNaN(mulInvTarget)) return false;
+            if (row.mulInv !== mulInvTarget) return false;
+          }
+
+          // 6. 最高次方
+          if (filters.degree !== 'all' && row.deg !== parseInt(filters.degree, 10)) return false;
+
+          // 7. 階數 Order
+          if (filters.order !== 'all') {
+            if (filters.order === 'none') {
+              if (row.order !== null) return false;
+            } else if (row.order !== parseInt(filters.order, 10)) {
+              return false;
+            }
+          }
+
+          // 8. 非零項數 / 漢明權重
+          if (filters.weight !== 'all' && row.weight !== parseInt(filters.weight, 10)) return false;
+
+          return true;
+        });
+
+        // 排序 (null 值恆排於尾端)
+        const dir = sortDir === 'asc' ? 1 : -1;
+        matched.sort((r1, r2) => {
+          const getVal = (r) => {
+            if (sortKey === 'dec') return r.dec;
+            if (sortKey === 'deg') return r.deg;
+            if (sortKey === 'log') return r.logStep;
+            if (sortKey === 'order') return r.order;
+            if (sortKey === 'addInv') return r.addInv;
+            if (sortKey === 'mulInv') return r.mulInv;
+            return r.dec;
+          };
+          const v1 = getVal(r1);
+          const v2 = getVal(r2);
+          if (v1 === null && v2 === null) return r1.dec - r2.dec;
+          if (v1 === null) return 1;
+          if (v2 === null) return -1;
+          if (v1 === v2) return r1.dec - r2.dec;
+          return (v1 - v2) * dir;
+        });
+
+        State.filteredRows = matched;
+
+        countBadge.textContent = `顯示 ${matched.length} / ${size} 筆`;
+        const primCount = matched.filter((r) => r.isPrimitive).length;
+        $('tableStatusText').innerHTML = `符合條件：<strong style="color:var(--text-primary)">${matched.length}</strong> / ${size} 個元素（含 <strong style="color:var(--purple-light)">${primCount}</strong> 個本原元）`;
+
+        renderReferenceTable(aVal, bVal);
+      }
+
+      function renderReferenceTable(aVal, bVal) {
+        const { p, sortKey, sortDir, filteredRows } = State;
+
+        const thSort = (key, label, colorStyle = '') => {
+          const isSorted = sortKey === key;
+          const arrow = isSorted ? (sortDir === 'asc' ? '↑' : '↓') : '↕';
+          return `<th class="sortable${isSorted ? ' sorted' : ''}" data-sort="${key}" style="${colorStyle}">${label}<span class="sort-arrow">${arrow}</span></th>`;
+        };
+
+        $('refTableHead').innerHTML = `
+          ${thSort('dec', '十進位 (Dec)')}
+          <th>${p === 2 ? '二進位 / Hex' : `Base-${p} 係數向量`}</th>
+          <th>多項式</th>
+          ${thSort('deg', '次方 (Deg)')}
+          ${thSort('log', 'Log 步數 (gᵏ)', 'color:var(--amber);')}
+          ${thSort('order', '乘法階數 (Order)', 'color:var(--purple-light);')}
+          ${thSort('addInv', '加法反元素 (−a)', 'color:var(--amber);')}
+          ${thSort('mulInv', '乘法反元素 (a⁻¹)', 'color:var(--emerald);')}
+          <th style="text-align:right;">操作</th>
+        `;
+
+        const tbody = $('refTableBody');
+        if (filteredRows.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:36px 16px; color:var(--text-muted); font-family:var(--font-sans);">沒有符合目前篩選條件的元素，請調整輸入或點擊「重置所有篩選」。</td></tr>`;
+          return;
+        }
+
+        const htmlParts = new Array(filteredRows.length);
+        for (let i = 0; i < filteredRows.length; i++) {
+          const r = filteredRows[i];
+          const isA = r.dec === aVal;
+          const isB = r.dec === bVal;
+          const rowCls = isA && isB ? 'row-is-ab' : isA ? 'row-is-a' : isB ? 'row-is-b' : '';
+          const abTags = `${isA ? '<span class="pill-tag pill-a">A</span>' : ''}${isB ? '<span class="pill-tag pill-b">B</span>' : ''}`;
+
+          const reprCol = p === 2
+            ? `<span style="color:var(--text-secondary)">${r.binSpaced}</span> <span style="color:var(--cyan); margin-left:4px;">${r.hex}</span>`
+            : `<span style="color:var(--text-secondary)">${r.vec}</span> <span style="color:var(--text-muted); font-size:11px;">[${r.basePStr}]</span>`;
+
+          const degCol = r.deg < 0 ? `<span style="color:var(--text-muted)">−∞</span>` : `<span style="color:var(--text-secondary)">${r.deg}</span>`;
+
+          const logCol = r.logStep === null
+            ? `<span style="color:var(--text-muted)">—</span>`
+            : `<span style="color:var(--amber); font-weight:700;">${r.logStep}</span> <span style="color:var(--text-muted); font-size:11px;">(g<sup>${r.logStep}</sup>)</span>`;
+
+          const ordCol = r.order === null
+            ? `<span style="color:var(--text-muted)">—</span>`
+            : r.isPrimitive
+            ? `<span style="color:var(--purple-light); font-weight:700;">${r.order}</span><span class="pill-tag pill-prim">本原</span>`
+            : `<span style="color:var(--text-secondary)">${r.order}</span>`;
+
+          const mulInvCol = r.mulInv === null
+            ? `<span style="color:var(--rose)">無</span>`
+            : `<span style="color:var(--emerald); font-weight:700;">${r.mulInv}</span>${p === 2 ? ` <span style="color:var(--text-muted); font-size:11px;">${r.mulInvHex}</span>` : ''} <span class="poly-expr" style="color:var(--text-secondary)">(${r.mulInvHTML})</span>`;
+
+          htmlParts[i] = `
+            <tr class="${rowCls}">
+              <td><strong style="color:var(--text-primary)">${r.dec}</strong>${abTags}</td>
+              <td>${reprCol}</td>
+              <td class="poly-expr"><span style="color:var(--cyan); font-weight:600;">${r.polyHTML}</span></td>
+              <td>${degCol}</td>
+              <td>${logCol}</td>
+              <td>${ordCol}</td>
+              <td class="poly-expr"><span style="color:var(--amber);">${r.addInv}</span> <span style="color:var(--text-muted)">(${r.addInvHTML})</span></td>
+              <td>${mulInvCol}</td>
+              <td style="text-align:right;">
+                <button class="btn btn-sm btn-cyan assign-btn" data-assign="A" data-val="${r.dec}" type="button">設為 A</button>
+                <button class="btn btn-sm btn-purple assign-btn" data-assign="B" data-val="${r.dec}" type="button">設為 B</button>
+              </td>
+            </tr>
+          `;
+        }
+
+        tbody.innerHTML = htmlParts.join('');
+      }
+
+      function resetTableFilters(reRender = true) {
+        State.quickChip = 'all';
+        State.filters = {
+          radixMode: 'all',
+          general: '',
+          decMin: '',
+          decMax: '',
+          logStep: '',
+          mulInv: '',
+          degree: 'all',
+          order: 'all',
+          weight: 'all',
+        };
+        $('filterRadixMode').value = 'all';
+        $('filterGeneral').value = '';
+        $('filterDecMin').value = '';
+        $('filterDecMax').value = '';
+        $('filterLogStep').value = '';
+        $('filterMulInv').value = '';
+        $('filterDegree').value = 'all';
+        $('filterOrder').value = 'all';
+        $('filterWeight').value = 'all';
+        updateSearchPlaceholder();
+        updateQuickChipStyles();
+        if (reRender) applyFiltersAndRenderTable();
+      }
+
+      function updateQuickChipStyles() {
+        document.querySelectorAll('#quickChipBar .chip').forEach((chip) => {
+          const key = chip.dataset.chip;
+          chip.className = 'chip';
+          if (key === State.quickChip) {
+            if (key === 'primitive') chip.classList.add('active-purple');
+            else if (key === 'selfMulInv') chip.classList.add('active-emerald');
+            else if (key === 'selfAddInv') chip.classList.add('active-amber');
+            else chip.classList.add('active');
+          }
+        });
+      }
+
+      function exportFilteredCsv() {
+        if (!State.filteredRows.length) {
+          showToast('目前篩選結果為空，無法匯出 CSV');
+          return;
+        }
+        const { p, n, mPoly } = State;
+        const esc = (val) => `"${String(val ?? '').replace(/"/g, '""')}"`;
+
+        const headers = p === 2
+          ? ['十進位', '十六進位', '二進位', '八進位', '多項式', '最高次方', '漢明權重', 'Log 步數', '乘法階數', '是否本原元', '加法反元素', '乘法反元素', '乘法反元素多項式']
+          : ['十進位', `Base-${p}`, '係數向量', '多項式', '最高次方', '非零項數', 'Log 步數', '乘法階數', '是否本原元', '加法反元素', '乘法反元素', '乘法反元素多項式'];
+
+        const lines = [headers.map(esc).join(',')];
+        State.filteredRows.forEach((r) => {
+          const cols = p === 2
+            ? [r.dec, r.hex, r.binCompact, r.octStr, r.polyAscii, r.deg < 0 ? '-inf' : r.deg, r.weight, r.logStep ?? '', r.order ?? '', r.isPrimitive ? '是' : '否', r.addInv, r.mulInv ?? '無', r.mulInvPlain || '無']
+            : [r.dec, r.basePStr, r.vec, r.polyAscii, r.deg < 0 ? '-inf' : r.deg, r.weight, r.logStep ?? '', r.order ?? '', r.isPrimitive ? '是' : '否', r.addInv, r.mulInv ?? '無', r.mulInvPlain || '無'];
+          lines.push(cols.map(esc).join(','));
+        });
+
+        const csvContent = '\uFEFF' + lines.join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const mTag = p === 2 && n > 1 ? `_0x${GFMath.polyToInt(mPoly, 2).toString(16).toUpperCase()}` : '';
+        a.href = url;
+        a.download = `GF_${p}pow${n}${mTag}_elements.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`已匯出 ${State.filteredRows.length} 筆元素資料為 CSV`);
+      }
+
+      /* =======================================================================
+         8. 事件監聽綁定與安全初始化
+         ======================================================================= */
+      function initEvents() {
+        $('inputP').addEventListener('input', (e) => {
+          const v = parseInt(e.target.value, 10);
+          if (!isNaN(v)) {
+            State.p = v;
+            document.querySelectorAll('.preset-btn').forEach((b) => b.classList.remove('active'));
+            rebuildField();
+          }
+        });
+
+        $('inputN').addEventListener('input', (e) => {
+          const v = parseInt(e.target.value, 10);
+          if (!isNaN(v)) {
+            State.n = v;
+            document.querySelectorAll('.preset-btn').forEach((b) => b.classList.remove('active'));
+            rebuildField();
+          }
+        });
+
+        // 快速預設按鈕
+        document.querySelectorAll('.preset-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            document.querySelectorAll('.preset-btn').forEach((b) => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const parts = btn.dataset.preset.split(',');
+            State.p = parseInt(parts[0], 10);
+            State.n = parseInt(parts[1], 10);
+            State.polyMode = 'list';
+            $('inputP').value = State.p;
+            $('inputN').value = State.n;
+
+            let pref = null;
+            if (parts.length === 3) pref = parts[2];
+            else if (parts.length > 3) pref = parts.slice(2).map((x) => parseInt(x, 10));
+
+            rebuildField(pref);
+            showToast(`已切換至 ${btn.textContent}`);
+          });
+        });
+
+        // 多項式模式切換
+        $('btnPolyList').addEventListener('click', () => {
+          State.polyMode = 'list';
+          applyPolyModeUI();
+          onPolynomialChanged();
+        });
+
+        $('btnPolyCustom').addEventListener('click', () => {
+          State.polyMode = 'custom';
+          applyPolyModeUI();
+          onPolynomialChanged();
+        });
+
+        $('polySelect').addEventListener('change', (e) => {
+          State.selectedPolyIdx = parseInt(e.target.value, 10);
+          const item = State.polyList[State.selectedPolyIdx];
+          if (item) {
+            State.customCoeffs = [...item.poly];
+            renderCustomPolyInputs();
+          }
+          onPolynomialChanged();
+        });
+
+        $('customPolyHex').addEventListener('input', (e) => {
+          if (State.p !== 2) return;
+          const clean = e.target.value.replace(/^0x/i, '').replace(/[^0-9a-f]/gi, '');
+          const val = clean ? parseInt(clean, 16) : 0;
+          const arr = new Array(State.n + 1).fill(0);
+          for (let i = 0; i <= State.n; i++) arr[i] = (val >> i) & 1;
+          State.customCoeffs = arr;
+          document.querySelectorAll('#customPolyInputs input').forEach((inp) => {
+            inp.value = arr[parseInt(inp.dataset.deg, 10)] || 0;
+          });
+          onPolynomialChanged();
+        });
+
+        // 四則運算切換
+        document.querySelectorAll('.op-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            State.op = btn.dataset.op;
+            document.querySelectorAll('.op-btn').forEach((b) => b.classList.toggle('active', b === btn));
+            renderCalculations();
+          });
+        });
+
+        // 元素 A/B 同步輸入與操作按鈕
+        bindSyncInputs('A');
+        bindSyncInputs('B');
+
+        const randomize = (which) => {
+          const arr = new Array(State.n).fill(0).map(() => Math.floor(Math.random() * State.p));
+          if (arr.every((v) => v === 0)) arr[0] = 1;
+          if (which === 'A') State.elemA = arr;
+          else State.elemB = arr;
+          syncElementDisplays(which);
+        };
+
+        $('btnRandA').addEventListener('click', () => { randomize('A'); renderCalculations(); applyFiltersAndRenderTable(); });
+        $('btnRandB').addEventListener('click', () => { randomize('B'); renderCalculations(); applyFiltersAndRenderTable(); });
+        $('btnRandBoth').addEventListener('click', () => {
+          randomize('A');
+          randomize('B');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+          showToast('已隨機產生元素 A 與 B');
+        });
+
+        $('btnZeroA').addEventListener('click', () => {
+          State.elemA = new Array(State.n).fill(0);
+          syncElementDisplays('A');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+        $('btnZeroB').addEventListener('click', () => {
+          State.elemB = new Array(State.n).fill(0);
+          syncElementDisplays('B');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+
+        $('btnSwap').addEventListener('click', () => {
+          [State.elemA, State.elemB] = [State.elemB, State.elemA];
+          syncElementDisplays('A');
+          syncElementDisplays('B');
+          renderCalculations();
+          applyFiltersAndRenderTable();
+        });
+
+        // 頂部進位制選擇器與篩選欄位綁定
+        $('filterRadixMode').addEventListener('change', (e) => {
+          State.filters.radixMode = e.target.value;
+          updateSearchPlaceholder();
+          applyFiltersAndRenderTable();
+        });
+
+        const bindFilter = (id, key, evt = 'input') => {
+          $(id).addEventListener(evt, (e) => {
+            State.filters[key] = e.target.value;
+            applyFiltersAndRenderTable();
+          });
+        };
+        bindFilter('filterGeneral', 'general');
+        bindFilter('filterDecMin', 'decMin');
+        bindFilter('filterDecMax', 'decMax');
+        bindFilter('filterLogStep', 'logStep');
+        bindFilter('filterMulInv', 'mulInv');
+        bindFilter('filterDegree', 'degree', 'change');
+        bindFilter('filterOrder', 'order', 'change');
+        bindFilter('filterWeight', 'weight', 'change');
+
+        // 快捷篩選標籤
+        $('quickChipBar').addEventListener('click', (e) => {
+          const chip = e.target.closest('.chip');
+          if (!chip) return;
+          State.quickChip = chip.dataset.chip;
+          updateQuickChipStyles();
+          applyFiltersAndRenderTable();
+        });
+
+        $('btnResetFilters').addEventListener('click', () => {
+          resetTableFilters(true);
+          showToast('已重置所有篩選條件');
+        });
+
+        // 表頭排序
+        $('refTableHead').addEventListener('click', (e) => {
+          const th = e.target.closest('th.sortable');
+          if (!th) return;
+          const key = th.dataset.sort;
+          if (State.sortKey === key) {
+            State.sortDir = State.sortDir === 'asc' ? 'desc' : 'asc';
+          } else {
+            State.sortKey = key;
+            State.sortDir = 'asc';
+          }
+          applyFiltersAndRenderTable();
+        });
+
+        // 展開完整高度切換
+        $('btnToggleExpand').addEventListener('click', () => {
+          State.tableExpandedHeight = !State.tableExpandedHeight;
+          $('tableScrollBox').classList.toggle('expanded', State.tableExpandedHeight);
+          $('btnToggleExpand').textContent = State.tableExpandedHeight ? '固定視窗捲動 (600px)' : '展開完整高度';
+        });
+
+        // CSV 匯出
+        $('btnExportCsv').addEventListener('click', exportFilteredCsv);
+
+        // 點擊總表「設為 A / B」
+        $('refTableBody').addEventListener('click', (e) => {
+          const btn = e.target.closest('.assign-btn');
+          if (!btn) return;
+          const which = btn.dataset.assign;
+          const val = parseInt(btn.dataset.val, 10);
+          const poly = GFMath.intToPoly(val, State.p, State.n);
+          if (which === 'A') State.elemA = normalizeElem(poly, State.n, State.p);
+          else State.elemB = normalizeElem(poly, State.n, State.p);
+          syncElementDisplays(which);
+          renderCalculations();
+          applyFiltersAndRenderTable();
+          showToast(`已將元素 ${val} 帶入元素 ${which}`);
+        });
+      }
+
+      // 安全啟動 (支援 DOMContentLoaded 與已就緒狀態)
+      function boot() {
+        try {
+          initEvents();
+          rebuildField('11D', true);
+        } catch (err) {
+          console.error('GF Calculator init error:', err);
+          showToast('初始化發生錯誤：' + err.message);
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+  </script>
+</body>
+</html>
