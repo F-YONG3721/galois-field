@@ -21,6 +21,11 @@ duration: 35min
 ---
 # Galois Field
 
+<div class="mt-8 text-xl space-y-2 opacity-90">
+  <div>13360516 徐富勇</div>
+  <div>13361564 周育安</div>
+</div>
+
 ---
 src: ./pages/01-Galois人物介紹.md
 ---
