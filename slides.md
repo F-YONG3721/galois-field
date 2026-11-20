@@ -34,7 +34,7 @@ src: ./pages/03-代數結構簡介.md
 src: ./pages/04-Galois-Field.md
 ---
 ---
-src: ./pages/'05-Galois Field 多項式.md'
+src: ./pages/05-Galois Field 多項式.md
 ---
 ---
 src: ./pages/06-程式實做.md
