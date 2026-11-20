@@ -1,0 +1,18 @@
+{
+  "cases": [
+    {
+      "id": "TRACE-001",
+      "operation": "GF(8) multiply, enabled trace",
+      "expectedResult": [
+        0,
+        0,
+        1
+      ],
+      "expectedContains": [
+        "multiply",
+        "reduce"
+      ]
+    }
+  ],
+  "description": "Trace representation is finalized in P0; exact event shape must be independently tested."
+}

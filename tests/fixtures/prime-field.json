@@ -1,0 +1,43 @@
+{
+  "description": "Independently checked GF(p) known-answer inputs",
+  "cases": [
+    {
+      "id": "PF-ADD-001",
+      "p": "7",
+      "op": "add",
+      "input": [
+        "3",
+        "6"
+      ],
+      "expected": "2"
+    },
+    {
+      "id": "PF-MUL-001",
+      "p": "7",
+      "op": "mul",
+      "input": [
+        "3",
+        "5"
+      ],
+      "expected": "1"
+    },
+    {
+      "id": "PF-INV-001",
+      "p": "7",
+      "op": "inv",
+      "input": [
+        "3"
+      ],
+      "expected": "5"
+    },
+    {
+      "id": "PF-NEG-001",
+      "p": "7",
+      "op": "normalize",
+      "input": [
+        "-1"
+      ],
+      "expected": "6"
+    }
+  ]
+}

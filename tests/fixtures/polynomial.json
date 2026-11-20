@@ -1,0 +1,56 @@
+{
+  "description": "Coefficients are little-endian",
+  "cases": [
+    {
+      "id": "POLY-MUL-001",
+      "p": "2",
+      "op": "multiply",
+      "input": [
+        [
+          1,
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "expected": [
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "id": "POLY-DIV-001",
+      "p": "2",
+      "op": "divmod",
+      "input": [
+        [
+          1,
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          0,
+          1
+        ]
+      ],
+      "expected": {
+        "quotient": [
+          1
+        ],
+        "remainder": [
+          0,
+          0,
+          1
+        ]
+      }
+    }
+  ]
+}
