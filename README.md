@@ -9,6 +9,13 @@ To start the slide show:
 Edit the [slides.md](./slides.md) to see the changes.
 
 Learn more about Slidev at the [documentation](https://sli.dev/).
+## 參考資料
+[https://hackmd.io/@ChenKunTW/GaloisField](https://hackmd.io/@ChenKunTW/GaloisField?fbclid=IwZXh0bgNhZW0CMTEAAR0jsMVMZTFyK70t1BryZz-ay7ODzxCCv585c_g3kBxZAwFrOneVSWL2uHI_aem_tlqpkFf8Z_H78kRJROpLmA#Construction-of-)
+[Galois Fields and Galois Rings Made Easy-Science Direct](https://www.sciencedirect.com/science/chapter/monograph/pii/B9781785482359500026)
+[抽象代數導論 John B. Fraleigh著 吳素美 范麗昌 譯]
+chatgpt.com
+
+
 ## 如何共編簡報？
 ### 抓github的資料 
 1. 先從github複製專案
