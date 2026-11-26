@@ -34,13 +34,13 @@ $$
 #####  加法表：
 | $\oplus$ |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
 |:--------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-|  **0**   |  <span style= "color:red">0</span>  |  1  |  2  |  3  |  4  |  5  |  6  |
-|  **1**   |  1  |  2  |  3  |  4  |  5  |  6  |  <span style= "color:red">0</span>  |
-|  **2**   |  2  |  3  |  4  |  5  |  6  |  <span style= "color:red">0</span>  |  1  |
-|  **3**   |  3  |  4  |  5  |  6  |  <span style= "color:red">0</span>  |  1  |  2  |
-|  **4**   |  4  |  5  |  6  |  <span style= "color:red">0</span>  |  1  |  2  |  3  |
-|  **5**   |  5  |  6  |  <span style= "color:red">0</span>  |  1  |  2  |  3  |  4  |
-|  **6**   |  6  |  <span style= "color:red">0</span>  |  1  |  2  |  3  |  4  |  5  |
+|  **0**   |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |  5  |  6  |
+|  **1**   |  1  |  2  |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |
+|  **2**   |  2  |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |
+|  **3**   |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |
+|  **4**   |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |
+|  **5**   |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |
+|  **6**   |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |  5  |
 
 ---
 ---
@@ -50,12 +50,12 @@ $$
 | $\odot$ |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
 |:-------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |  **0**  |  0  |  0  |  0  |  0  |  0  |  0  |  0  |
-|  **1**  |  0  |  <span style= "color:red">1</span>  |  2  |  3  |  4  |  5  |  6  |
-|  **2**  |  0  |  2  |  4  |  6  |  <span style= "color:red">1</span>  |  3  |  5  |
-|  **3**  |  0  |  3  |  6  |  2  |  5  |  <span style= "color:red">1</span>  |  4  |
-|  **4**  |  0  |  4  |  <span style= "color:red">1</span>  |  5  |  2  |  6  |  3  |
-|  **5**  |  0  |  5  |  3  |  <span style= "color:red">1</span>  |  6  |  4  |  2  |
-|  **6**  |  0  |  6  |  5  |  4  |  3  |  2  |  <span style= "color:red">1</span>  |
+|  **1**  |  0  |  <span class="highlight-red">1</span>  |  2  |  3  |  4  |  5  |  6  |
+|  **2**  |  0  |  2  |  4  |  6  |  <span class="highlight-red">1</span>  |  3  |  5  |
+|  **3**  |  0  |  3  |  6  |  2  |  5  |  <span class="highlight-red">1</span>  |  4  |
+|  **4**  |  0  |  4  |  <span class="highlight-red">1</span>  |  5  |  2  |  6  |  3  |
+|  **5**  |  0  |  5  |  3  |  <span class="highlight-red">1</span>  |  6  |  4  |  2  |
+|  **6**  |  0  |  6  |  5  |  4  |  3  |  2  |  <span class="highlight-red">1</span>  |
 
 ---
 ---
@@ -166,7 +166,7 @@ $$
 ---
 ---
 ### 多項式商環
-為什麼可以用多項式的餘是表示
+為什麼可以用多項式的餘來表示?<br>
 根據多項式除法：
 $$
 a(x)=q(x)f(x)+r(x)
@@ -183,7 +183,7 @@ $$
 $$
 [a(x)]=[r(x)]
 $$
-這表示$\;GF(p)[x]/(f(x)\;$中的每個元素都可以用最高次方小於$\;f(x)\;$的多項式表示
+這表示$\;GF(p)[x]/(f(x))\;$中的每個元素都可以用最高次方小於$\;f(x)\;$的多項式表示
 
 ---
 ---
@@ -191,7 +191,7 @@ $$
 若$\;f(x)\;$的最高次方項為$\;n\;$則
 $$
 \begin{aligned}
-GF(p)[x]/(f(x)) &= \left\{\sum_{i=0}^{n-1}{a_ix^i\;\middle|\;a_i\in GF(p)}\right\} \\
+GF(p)[x]/(f(x)) &= \left\{\sum_{i=0}^{n-1}{a_ix^i \; \middle| \; a_i\in GF(p)}\right\} \\
 &=\{a_0+a_1x^1+a_2x^2+...+a_{n-1}x^{n-1} \;|\;0 \le i < n, a_i \in GF(p)\}
 \end{aligned}
 $$
@@ -204,8 +204,8 @@ $$
 ---
 ### 不可約多項式
 不可約多項式和質數一樣，都無法再拆成兩個元素相乘（不可約多項式無法拆成兩個多項式相乘）。所以不可約多項式會與$\;GF(p)[x]\;$中的所有元素互質。
-我們可以在$\;GF(p)[x]\;$中選擇一個多項式來建立理想(ideal)，來建立一個類似模$\;n\;$整數環的結構。<br>
-首項係數必須為1。
+我們可以在$\;GF(p)[x]\;$中選擇一個不可約多項式來建立理想(ideal)，來建立一個類似模$\;n\;$整數環的結構。<br><br>
+通常選擇首項係數為$\;1\;$的不可約多項式。
 
 ---
 ---
@@ -314,7 +314,7 @@ $$
 因為$\;x\;$通常表示為變數，在這裡我們把$\;x\;$換成$\;\alpha\;$使集合中的多項式變成一種具體的元素
 $$
 \begin{aligned}
-GF(p^n) = \{0,\; 1,\; 2,\; \alpha,\; 1+\alpha,\; 2+\alpha,\; 2\alpha,\; 1+2\alpha,\; 2+2\alpha\}
+GF(3^2) = \{0,\; 1,\; 2,\; \alpha,\; 1+\alpha,\; 2+\alpha,\; 2\alpha,\; 1+2\alpha,\; 2+2\alpha\}
 \end{aligned}
 $$
 
@@ -322,26 +322,26 @@ $$
 ---
 | $\oplus$ | 0| 1 | 2| α| 1+α| 2+α|2α| 1+2α| 2+2α|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **0** | <span style="color:red">0</span> | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
-| **1** | 1 | 2 | <span style="color:red">0</span> | 1+α | 2+α | α | 1+2α | 2+2α | 2α |
-| **2** | 2 | <span style="color:red">0</span> | 1 | 2+α | α | 1+α | 2+2α | 2α | 1+2α |
-| **α** | α | 1+α | 2+α | 2α | 1+2α | 2+2α | <span style="color:red">0</span> | 1 | 2 |
-| **1+α** | 1+α | 2+α | α | 1+2α | 2+2α | 2α | 1 | 2 | <span style="color:red">0</span> |
-| **2+α** | 2+α | α | 1+α | 2+2α | 2α | 1+2α | 2 | <span style="color:red">0</span> | 1 |
-| **2α** | 2α | 1+2α | 2+2α | <span style="color:red">0</span> | 1 | 2 | α | 1+α | 2+α |
-| **1+2α** | 1+2α | 2+2α | 2α | 1 | 2 | <span style="color:red">0</span> | 1+α | 2+α | α |
-| **2+2α** | 2+2α | 2α | 1+2α | 2 | <span style="color:red">0</span> | 1 | 2+α | α | 1+α |
+| **0** | <span class="highlight-red">0</span> | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
+| **1** | 1 | 2 | <span class="highlight-red">0</span> | 1+α | 2+α | α | 1+2α | 2+2α | 2α |
+| **2** | 2 | <span class="highlight-red">0</span> | 1 | 2+α | α | 1+α | 2+2α | 2α | 1+2α |
+| **α** | α | 1+α | 2+α | 2α | 1+2α | 2+2α | <span class="highlight-red">0</span> | 1 | 2 |
+| **1+α** | 1+α | 2+α | α | 1+2α | 2+2α | 2α | 1 | 2 | <span class="highlight-red">0</span> |
+| **2+α** | 2+α | α | 1+α | 2+2α | 2α | 1+2α | 2 | <span class="highlight-red">0</span> | 1 |
+| **2α** | 2α | 1+2α | 2+2α | <span class="highlight-red">0</span> | 1 | 2 | α | 1+α | 2+α |
+| **1+2α** | 1+2α | 2+2α | 2α | 1 | 2 | <span class="highlight-red">0</span> | 1+α | 2+α | α |
+| **2+2α** | 2+2α | 2α | 1+2α | 2 | <span class="highlight-red">0</span> | 1 | 2+α | α | 1+α |
 
 ---
 ---
 | $\odot$ | 0 | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **0** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **1** | 0 | <span style="color:red">**1**</span> | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
-| **2** | 0 | 2 | <span style="color:red">**1**</span> | 2α | 2+2α | 1+2α | α | 2+α | 1+α |
-| **α** | 0 | α | 2α | 2 | 2+α | 2+2α | <span style="color:red">**1**</span> | 1+α | 1+2α |
-| **1+α** | 0 | 1+α | 2+2α | 2+α | 2α | <span style="color:red">**1**</span> | 1+2α | 2 | α |
-| **2+α** | 0 | 2+α | 1+2α | 2+2α | <span style="color:red">**1**</span> | α | 1+α | 2α | 2 |
-| **2α** | 0 | 2α | α | <span style="color:red">**1**</span> | 1+2α | 1+α | 2 | 2+2α | 2+α |
-| **1+2α** | 0 | 1+2α | 2+α | 1+α | 2 | 2α | 2+2α | α | <span style="color:red">**1**</span> |
-| **2+2α** | 0 | 2+2α | 1+α | 1+2α | α | 2 | 2+α | <span style="color:red">**1**</span> | 2α |
+| **1** | 0 | <span class="highlight-red">**1**</span> | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
+| **2** | 0 | 2 | <span class="highlight-red">**1**</span> | 2α | 2+2α | 1+2α | α | 2+α | 1+α |
+| **α** | 0 | α | 2α | 2 | 2+α | 2+2α | <span class="highlight-red">**1**</span> | 1+α | 1+2α |
+| **1+α** | 0 | 1+α | 2+2α | 2+α | 2α | <span class="highlight-red">**1**</span> | 1+2α | 2 | α |
+| **2+α** | 0 | 2+α | 1+2α | 2+2α | <span class="highlight-red">**1**</span> | α | 1+α | 2α | 2 |
+| **2α** | 0 | 2α | α | <span class="highlight-red">**1**</span> | 1+2α | 1+α | 2 | 2+2α | 2+α |
+| **1+2α** | 0 | 1+2α | 2+α | 1+α | 2 | 2α | 2+2α | α | <span class="highlight-red">**1**</span> |
+| **2+2α** | 0 | 2+2α | 1+α | 1+2α | α | 2 | 2+α | <span class="highlight-red">**1**</span> | 2α |
