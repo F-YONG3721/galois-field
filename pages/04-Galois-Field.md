@@ -1,6 +1,16 @@
 # Galois Field
+<p class='text-xl'>
 Galois Field又稱Finite Field，指的是在有限的集合F中，滿足Field的定義。
-在集合F中，裡面的元素可以做加法與乘法的運算，其結果依然在集合F中，加法與乘法必須滿足它們的公理與符合分配律。
+在集合F中，裡面的元素可以做加法與乘法的運算，其結果依然在集合F中，
+加法與乘法必須滿足它們的公理與符合分配律。
+</p>
+<style>
+/* 解除預設的半透明效果，並強制純白 */
+p, li {
+  color: #ffffff !important;
+  opacity: 1 !important;
+}
+</style>
 
 ## $GF(p)$
 ### 定義
@@ -91,7 +101,7 @@ $$
 設$\;GF(p) = \{0, 1, 2, ..., p-1\}$<br><br>
 $GF(p)[x]$：
 $$
-GF(p)[x] = \left\{ \sum_{i=0}^n{a_ix^i}\ |\ n \in \mathbb Z_{\ge0}, a_i \in GF(p)\right\}
+GF(p)[x] = \left\{ \sum_{i=0}^n{a_ix^i}\;\middle|\; n \in \mathbb Z_{\ge0}, a_i \in GF(p)\right\}
 $$
 ex:
 $$
@@ -130,9 +140,7 @@ $$
 ### 多項式理想(ideal)
 設$\;f(x)\in GF(p)[x],\; f(x)為非零多項式$
 #### 定義$\;f(x)\;$生成的理想：
-$$
-(f(x)) = \{f(x)q(x)\; |\; q(x) \in GF(p)[x]\}
-$$
+$$(f(x)) = \{f(x)q(x)\;|\; q(x) \in GF(p)[x]\}$$
 
 
 ---
@@ -151,7 +159,7 @@ $$
 因此
 $$ 
 \begin{aligned}
-GF(p)[x]/(f(x)) &= \{a(x)\; |\; a(x) \in GF(p)[x]\}
+GF(p)[x]/(f(x)) &= \{a(x)\;|\; a(x) \in GF(p)[x]\}
 \end{aligned} 
 $$
 
@@ -183,7 +191,7 @@ $$
 若$\;f(x)\;$的最高次方項為$\;n\;$則
 $$
 \begin{aligned}
-GF(p)[x]/(f(x)) &=\{\sum_{i=0}^{n-1}{a_ix^i\; |\;a_i\in GF(p)}\} \\
+GF(p)[x]/(f(x)) &= \left\{\sum_{i=0}^{n-1}{a_ix^i\;\middle|\;a_i\in GF(p)}\right\} \\
 &=\{a_0+a_1x^1+a_2x^2+...+a_{n-1}x^{n-1} \;|\;0 \le i < n, a_i \in GF(p)\}
 \end{aligned}
 $$
@@ -205,9 +213,9 @@ $$
 設$\;f(x) \in GF(p)[x],\; deg(f(x)) = n,\; f(x)\;$為不可約多項式
 $$
 \begin{aligned}
-GF(p^n) &= GF(p)[x]/(f(x)) \\
-&=\{\sum_{i=0}^{n-1}{a_ix^i |a_i\in GF(p)}\} \\
-&=\{a_0+a_1x^1+a_2x^2+...+a_{n-1}x^{n-1} \;|\;0 \le i < n,\; a_i \in GF(p)\}
+GF(p^n) &= GF(p)[x]/(f(x)) \\ \\
+&=\left\{\sum_{i=0}^{n-1}{a_ix^i \;\middle|\; a_i\in GF(p)}\right\} \\ \\
+&=\{a_0+a_1x^1+a_2x^2+...+a_{n-1}x^{n-1} \;|\; 0 \le i < n,\; a_i \in GF(p)\}
 \end{aligned}
 $$
 
