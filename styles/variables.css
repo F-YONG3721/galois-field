@@ -1,0 +1,46 @@
+:root {
+    /* 標題字體大小 */
+    --h1-size: 32px;
+    --h2-size: 26px;
+    --h3-size: 22px;
+    --h4-size: 20px;
+    --h5-size: 18px;
+    --h6-size: 16px;
+
+    /* 標題字體粗細 */
+    --h1-weight: 600;
+    --h2-weight: 500;
+    --h3-weight: 500;
+
+    /* 內文字體 */
+    --body-size: 18px;
+    --body-line-height: 1.6;
+
+    /* 間距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* 投影片內距 */
+    --slide-padding-x: 40px;
+    --slide-padding-y: 30px;
+
+    /* 表格 */
+    --table-font-size: 16px;
+    --table-padding-x: 0px;
+    --table-padding-y: 0px;
+
+    /* 顏色 */
+    --color-primary: #2563eb;
+    --color-text: #333333;
+    --color-border: #cccccc;
+}
+
+/* 深色模式 */
+html.dark {
+    --color-primary: #93c5fd;
+    --color-text: #dddddd;
+    --color-border: #555555;
+}
