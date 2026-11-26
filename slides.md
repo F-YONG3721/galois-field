@@ -1,5 +1,9 @@
 ---
-theme: default 
+theme: academic
+themeConfig:
+    paginationX: r
+    paginationY: b
+    paginationPagesDisabled: [1]
 title: Galois Field
 colorSchema: dark
 # info: |
