@@ -32,30 +32,38 @@ $$
 ### 以$\;GF(7)\;$為例子
 #### $GF(7)$
 #####  加法表：
+<Transform :scale="0.9" origin="top center">
+
 | $\oplus$ |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
 |:--------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-|  **0**   |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |  5  |  6  |
-|  **1**   |  1  |  2  |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |
-|  **2**   |  2  |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |
-|  **3**   |  3  |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |
-|  **4**   |  4  |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |
-|  **5**   |  5  |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |
-|  **6**   |  6  |  <span class="highlight-red">0</span>  |  1  |  2  |  3  |  4  |  5  |
+|  **0**   |  <span class="fixed-red">0</span>  |  1  |  2  |  3  |  4  |  5  |  6  |
+|  **1**   |  1  |  2  |  3  |  4  |  5  |  6  |  <span class="fixed-red">0</span>  |
+|  **2**   |  2  |  3  |  4  |  5  |  6  |  <span class="fixed-red">0</span>  |  1  |
+|  **3**   |  3  |  4  |  5  |  6  |  <span class="fixed-red">0</span>  |  1  |  2  |
+|  **4**   |  4  |  5  |  6  |  <span class="fixed-red">0</span>  |  1  |  2  |  3  |
+|  **5**   |  5  |  6  |  <span class="fixed-red">0</span>  |  1  |  2  |  3  |  4  |
+|  **6**   |  6  |  <span class="fixed-red">0</span>  |  1  |  2  |  3  |  4  |  5  |
+
+</Transform>
 
 ---
 ---
 ### 以$\;GF(7)\;$為例子
 #### $GF(7)$
 ##### 乘法表：
+<Transform :scale="0.9" origin="top center">
+
 | $\odot$ |  0  |  1  |  2  |  3  |  4  |  5  |  6  |
 |:-------:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |  **0**  |  0  |  0  |  0  |  0  |  0  |  0  |  0  |
-|  **1**  |  0  |  <span class="highlight-red">1</span>  |  2  |  3  |  4  |  5  |  6  |
-|  **2**  |  0  |  2  |  4  |  6  |  <span class="highlight-red">1</span>  |  3  |  5  |
-|  **3**  |  0  |  3  |  6  |  2  |  5  |  <span class="highlight-red">1</span>  |  4  |
-|  **4**  |  0  |  4  |  <span class="highlight-red">1</span>  |  5  |  2  |  6  |  3  |
-|  **5**  |  0  |  5  |  3  |  <span class="highlight-red">1</span>  |  6  |  4  |  2  |
-|  **6**  |  0  |  6  |  5  |  4  |  3  |  2  |  <span class="highlight-red">1</span>  |
+|  **1**  |  0  |  <span class="fixed-red">1</span>  |  2  |  3  |  4  |  5  |  6  |
+|  **2**  |  0  |  2  |  4  |  6  |  <span class="fixed-red">1</span>  |  3  |  5  |
+|  **3**  |  0  |  3  |  6  |  2  |  5  |  <span class="fixed-red">1</span>  |  4  |
+|  **4**  |  0  |  4  |  <span class="fixed-red">1</span>  |  5  |  2  |  6  |  3  |
+|  **5**  |  0  |  5  |  3  |  <span class="fixed-red">1</span>  |  6  |  4  |  2  |
+|  **6**  |  0  |  6  |  5  |  4  |  3  |  2  |  <span class="fixed-red">1</span>  |
+
+</Transform>
 
 ---
 ---
@@ -70,6 +78,9 @@ $$
 ### 以$\;GF(7)\;$為例子
 #### $GF(7)$
 ##### 加法反元素
+
+<Transform :scale="0.9" origin="top center">
+
 | 元素 $\;a$ | 加法反元素 $\;-a$ | 運算過程                     |
 |:--------:|:---------------:|:---------------------------- |
 |    0     |        0        | $(0 + 0) \bmod 7 = 0$        |
@@ -79,12 +90,16 @@ $$
 |    4     |        3        | $(4+3)\bmod7 = 7\bmod 7 = 0$ |
 |    5     |        2        | $(5+2)\bmod7 = 7\bmod 7 = 0$ |
 |    6     |        1        | $(6+1)\bmod7 = 7\bmod 7 = 0$ |
+</Transform>
 
 ---
 ---
 ### 以$\;GF(7)\;$為例子
 #### $GF(7)$
 ##### 乘法反元素
+
+<Transform :scale="0.9" origin="top center">
+
 | 元素 $\;a\;$ | 乘法反元素 $\;a^{-1}$ | 運算過程                              |
 |:--------:|:-------------------:|:------------------------------------- |
 |    1     |          1          | $(1\times 1)\bmod 7 = 1 \bmod 7 = 1$  |
@@ -93,6 +108,8 @@ $$
 |    4     |          2          | $(4\times 2)\bmod 7 = 8 \bmod 7 = 1$  |
 |    5     |          3          | $(5\times 3)\bmod 7 = 15 \bmod 7 = 1$ |
 |    6     |          6          | $(6\times 6)\bmod 7 = 36\bmod 7 = 1$  |
+
+</Transform>
 
 ---
 
@@ -246,6 +263,9 @@ $$
 ---
 ---
 #### 檢查是否滿足體的公理
+
+<Transform :scale="0.9" origin="top center">
+
 | 性質 | 數學表示 | 簡單證明 |
 |---|---|---|
 | 加法封閉性（Closure） | $a\oplus b\in F$ | 兩個次數小於 $\;n\;$ 的多項式相加，結果仍小於 $\;n\;$ 次，且係數屬於 $\;GF(p)\;$。 |
@@ -253,10 +273,13 @@ $$
 | 加法交換律（Commutativity） | $a\oplus b=b\oplus a$ | 因為 $\;GF(p)\;$ 的加法滿足交換律，所以多項式加法也滿足交換律。 |
 | 加法單位元素（Identity） | $\exists 0\in F,\ a\oplus0=a$ | 零多項式 $\;0(x)=0\;$ 屬於 $\;F\;$，且任何多項式加上零多項式仍為自身。 |
 | 加法反元素（Inverse） | $\forall a\in F,\ \exists(-a)\in F,\ a\oplus(-a)=0$ | 因為 $\;GF(p)\;$ 中每個係數都有加法反元素，所以將多項式的所有係數取反即可。 |
-
+</Transform>
 ---
 ---
 #### 檢查是否滿足體的公理
+
+<Transform :scale="0.9" origin="top center">
+
 | 性質 | 數學表示 | 簡單證明 |
 |---|---|---|
 | 乘法封閉性（Closure） | $a\odot b\in F$ | 多項式相乘後，對 $\;f(x)\;$ 取餘數，結果次數小於 $\;n\;$，因此仍屬於 $\;F\;$。 |
@@ -264,6 +287,7 @@ $$
 | 乘法交換律（Commutativity） | $a\odot b=b\odot a$ | 因為多項式乘法滿足交換律，所以取模後仍滿足交換律。 |
 | 乘法單位元素（Identity） | $\exists 1\in F,\ a\odot1=a$ | 常數多項式 $\;1\;$ 屬於 $\;F\;$，且 $\;a(x)\cdot1=a(x)$。 |
 | 乘法反元素（Inverse） | $\forall a\in F\setminus\{0\},\ \exists a^{-1}\in F,\ a\odot a^{-1}=1$ | 因為 $\;f(x)\;$ 不可約，所有非零且次數小於 $\;n\;$ 的多項式都與 $\;f(x)\;$ 互質，因此由 Bézout 等式可得乘法反元素。 |
+</Transform>
 
 ---
 ---
@@ -320,28 +344,39 @@ $$
 
 ---
 ---
+##### 加法表
+
+<Transform :scale="0.9" origin="top center">
+
 | $\oplus$ | 0| 1 | 2| α| 1+α| 2+α|2α| 1+2α| 2+2α|
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **0** | <span class="highlight-red">0</span> | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
-| **1** | 1 | 2 | <span class="highlight-red">0</span> | 1+α | 2+α | α | 1+2α | 2+2α | 2α |
-| **2** | 2 | <span class="highlight-red">0</span> | 1 | 2+α | α | 1+α | 2+2α | 2α | 1+2α |
-| **α** | α | 1+α | 2+α | 2α | 1+2α | 2+2α | <span class="highlight-red">0</span> | 1 | 2 |
-| **1+α** | 1+α | 2+α | α | 1+2α | 2+2α | 2α | 1 | 2 | <span class="highlight-red">0</span> |
-| **2+α** | 2+α | α | 1+α | 2+2α | 2α | 1+2α | 2 | <span class="highlight-red">0</span> | 1 |
-| **2α** | 2α | 1+2α | 2+2α | <span class="highlight-red">0</span> | 1 | 2 | α | 1+α | 2+α |
-| **1+2α** | 1+2α | 2+2α | 2α | 1 | 2 | <span class="highlight-red">0</span> | 1+α | 2+α | α |
-| **2+2α** | 2+2α | 2α | 1+2α | 2 | <span class="highlight-red">0</span> | 1 | 2+α | α | 1+α |
+| **0** | <span class="fixed-red">0</span> | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
+| **1** | 1 | 2 | <span class="fixed-red">0</span> | 1+α | 2+α | α | 1+2α | 2+2α | 2α |
+| **2** | 2 | <span class="fixed-red">0</span> | 1 | 2+α | α | 1+α | 2+2α | 2α | 1+2α |
+| **α** | α | 1+α | 2+α | 2α | 1+2α | 2+2α | <span class="fixed-red">0</span> | 1 | 2 |
+| **1+α** | 1+α | 2+α | α | 1+2α | 2+2α | 2α | 1 | 2 | <span class="fixed-red">0</span> |
+| **2+α** | 2+α | α | 1+α | 2+2α | 2α | 1+2α | 2 | <span class="fixed-red">0</span> | 1 |
+| **2α** | 2α | 1+2α | 2+2α | <span class="fixed-red">0</span> | 1 | 2 | α | 1+α | 2+α |
+| **1+2α** | 1+2α | 2+2α | 2α | 1 | 2 | <span class="fixed-red">0</span> | 1+α | 2+α | α |
+| **2+2α** | 2+2α | 2α | 1+2α | 2 | <span class="fixed-red">0</span> | 1 | 2+α | α | 1+α |
+ </Transform>
 
 ---
 ---
+##### 乘法表
+
+<Transform :scale="0.9" origin="top center">
+
 | $\odot$ | 0 | 1 | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **0** | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-| **1** | 0 | <span class="highlight-red">**1**</span> | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
-| **2** | 0 | 2 | <span class="highlight-red">**1**</span> | 2α | 2+2α | 1+2α | α | 2+α | 1+α |
-| **α** | 0 | α | 2α | 2 | 2+α | 2+2α | <span class="highlight-red">**1**</span> | 1+α | 1+2α |
-| **1+α** | 0 | 1+α | 2+2α | 2+α | 2α | <span class="highlight-red">**1**</span> | 1+2α | 2 | α |
-| **2+α** | 0 | 2+α | 1+2α | 2+2α | <span class="highlight-red">**1**</span> | α | 1+α | 2α | 2 |
-| **2α** | 0 | 2α | α | <span class="highlight-red">**1**</span> | 1+2α | 1+α | 2 | 2+2α | 2+α |
-| **1+2α** | 0 | 1+2α | 2+α | 1+α | 2 | 2α | 2+2α | α | <span class="highlight-red">**1**</span> |
-| **2+2α** | 0 | 2+2α | 1+α | 1+2α | α | 2 | 2+α | <span class="highlight-red">**1**</span> | 2α |
+| **1** | 0 | <span class="fixed-red">**1**</span> | 2 | α | 1+α | 2+α | 2α | 1+2α | 2+2α |
+| **2** | 0 | 2 | <span class="fixed-red">**1**</span> | 2α | 2+2α | 1+2α | α | 2+α | 1+α |
+| **α** | 0 | α | 2α | 2 | 2+α | 2+2α | <span class="fixed-red">**1**</span> | 1+α | 1+2α |
+| **1+α** | 0 | 1+α | 2+2α | 2+α | 2α | <span class="fixed-red">**1**</span> | 1+2α | 2 | α |
+| **2+α** | 0 | 2+α | 1+2α | 2+2α | <span class="fixed-red">**1**</span> | α | 1+α | 2α | 2 |
+| **2α** | 0 | 2α | α | <span class="fixed-red">**1**</span> | 1+2α | 1+α | 2 | 2+2α | 2+α |
+| **1+2α** | 0 | 1+2α | 2+α | 1+α | 2 | 2α | 2+2α | α | <span class="fixed-red">**1**</span> |
+| **2+2α** | 0 | 2+2α | 1+α | 1+2α | α | 2 | 2+α | <span class="fixed-red">**1**</span> | 2α |
+
+</Transform>
