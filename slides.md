@@ -1,5 +1,9 @@
 ---
-theme: default 
+theme: academic
+themeConfig:
+    paginationX: r
+    paginationY: b
+    paginationPagesDisabled: [1]
 title: Galois Field
 colorSchema: dark
 # info: |
@@ -27,6 +31,9 @@ duration: 35min
 </div>
 
 ---
+src: ./pages/00-目錄.md
+---
+---
 src: ./pages/01-Galois人物介紹.md
 ---
 ---
@@ -40,9 +47,6 @@ src: ./pages/04-Galois-Field.md
 ---
 ---
 src: ./pages/05-Galois Field 多項式.md
----
----
-src: ./pages/calculator.md
 ---
 ---
 src: ./pages/06-程式實做.md

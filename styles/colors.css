@@ -1,0 +1,56 @@
+/* Light Mode */
+:root {
+  --color-red:    #b91c1c;
+  --color-blue:   #1d4ed8;
+  --color-green:  #15803d;
+  --color-yellow: #a16207;
+  --color-gray:   #64748b;
+  --fixed-red:    #ef4444;
+  --fixed-green:  #22c55e;
+  --fixed-blue:   #3b82f6;
+}
+
+/* Dark Mode */
+html.dark {
+  --color-red:    #f87171;
+  --color-blue:   #93c5fd;
+  --color-green:  #86efac;
+  --color-yellow: #fbbf24;
+  --color-gray:   #94a3b8;
+}
+
+/* Text Colors */
+.slidev-layout {
+  .fixed-red {
+    color: var(--fixed-red) !important;
+  }
+
+  .fixed-green {
+    color: var(--fixed-green) !important;
+  }
+
+  .fixed-blue {
+    color: var(--fixed-blue) !important;
+  }
+
+  .highlight-red {
+    color: var(--color-red);
+  }
+
+  .highlight-blue {
+    color: var(--color-blue);
+  }
+
+  .highlight-green {
+    color: var(--color-green);
+  }
+
+  .highlight-yellow {
+    color: var(--color-yellow);
+  }
+
+  .highlight-gray {
+    color: var(--color-gray);
+  }
+}
+

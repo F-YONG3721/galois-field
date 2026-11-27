@@ -1,0 +1,18 @@
+/* 一般內容頁 */
+.slidev-layout.default {
+    padding: var(--slide-padding-y)
+             var(--slide-padding-x);
+}
+
+/* 封面標題 */
+.slidev-layout.cover h1 {
+    font-size: 48px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* 章節分隔頁標題 */
+.slidev-layout.section h1 {
+    font-size: 40px;
+    font-weight: 700;
+}
