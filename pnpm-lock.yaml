@@ -21,6 +21,9 @@ importers:
         specifier: ^3.5.33
         version: 3.5.45(typescript@6.0.3)
     devDependencies:
+      markdown-it-multimd-table:
+        specifier: ^4.2.3
+        version: 4.2.3
       playwright-chromium:
         specifier: ^1.65.1
         version: 1.65.1
@@ -2130,6 +2133,9 @@ packages:
     resolution: {integrity: sha512-NNATF4QdoGI07hyCitoB2YqJ1YcNVCKT89ut2VtfFY9rkeFCXe/V2lOonKQLpJiq5DjiZZepf97BJx5xOjFIAw==}
     peerDependencies:
       markdown-it: '>= 13.0.0'
+
+  markdown-it-multimd-table@4.2.3:
+    resolution: {integrity: sha512-KepCr2OMJqm7IT6sOIbuqHGe+NERhgy66XMrc5lo6dHW7oaPzMDtYwR1EGwK16/blb6mCSg4jqityOe0o/H7HA==}
 
   markdown-it@14.3.3:
     resolution: {integrity: sha512-L//tDAkjTjJCU6pBUSBTgs3Kg4InVaZuUZog/b6V12UKhcDQ7S78877ibbCanRExwPuYP1CZD7Gd2dxSy1GXRg==}
@@ -5593,6 +5599,8 @@ snapshots:
   markdown-it-github-alerts@1.0.1(markdown-it@14.3.3):
     dependencies:
       markdown-it: 14.3.3
+
+  markdown-it-multimd-table@4.2.3: {}
 
   markdown-it@14.3.3:
     dependencies:
