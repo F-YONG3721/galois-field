@@ -176,6 +176,11 @@
       gap: 20px;
     }
 
+    /* 將互動矩陣區塊安排在有限體設定之後 */
+    #configSection { order: 1; }
+    #matrixToolsSection { order: 2; }
+    .container > section:not(#configSection):not(#matrixToolsSection) { order: 3; }
+
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -1782,7 +1787,7 @@
     <!-- =======================================================================
          區塊 1：有限體 GF(p^n) 與不可約多項式設定
          ======================================================================= -->
-    <section class="card">
+    <section class="card" id="configSection">
       <div class="section-head">
         <div class="section-title">
           <span class="step-badge step-cyan">1</span>
@@ -1866,12 +1871,12 @@
     </section>
 
     <!-- =======================================================================
-         區塊 2：元素輸入與四則運算 (加、減、乘、除)
+         區塊 3：元素輸入與四則運算 (加、減、乘、除)
          ======================================================================= -->
     <section class="card">
       <div class="section-head">
         <div class="section-title">
-          <span class="step-badge step-emerald">2</span>
+          <span class="step-badge step-emerald">3</span>
           <h2>元素輸入與四則運算（加、減、乘、除）</h2>
         </div>
         <div id="resultFormulaHeader" class="mono poly-expr" style="font-size: 12.5px; color: var(--text-secondary);"></div>
@@ -2001,12 +2006,12 @@
     </section>
 
     <!-- =======================================================================
-         區塊 3：加法與乘法反元素總覽 (元素 A 與元素 B)
+         區塊 4：加法與乘法反元素總覽 (元素 A 與元素 B)
          ======================================================================= -->
     <section class="card">
       <div class="section-head">
         <div class="section-title">
-          <span class="step-badge step-amber">3</span>
+          <span class="step-badge step-amber">4</span>
           <h2>加法與乘法反元素總覽（元素 A 與元素 B）</h2>
         </div>
       </div>
@@ -2018,12 +2023,12 @@
     </section>
 
     <!-- =======================================================================
-         區塊 4：完整元素與反元素總表 (含頂部進位制選擇搜尋框與多條件篩選)
+         區塊 5：完整元素與反元素總表 (含頂部進位制選擇搜尋框與多條件篩選)
          ======================================================================= -->
     <section class="card" id="tableSection">
       <div class="section-head" style="margin-bottom: 14px;">
         <div class="section-title">
-          <span class="step-badge step-purple">4</span>
+          <span class="step-badge step-purple">5</span>
           <div>
             <h2>
               完整元素與反元素總表
@@ -2149,12 +2154,12 @@
     </section>
 
     <!-- =======================================================================
-         區塊 5：互動多進位 ↔ 多項式矩陣表與實用輔助工具 (完整支援 p = 2, 3, 5, 7, 11)
+         區塊 2：互動多進位 ↔ 多項式矩陣表與實用輔助工具 (完整支援 p = 2, 3, 5, 7, 11)
          ======================================================================= -->
     <section class="card" id="matrixToolsSection">
       <div class="section-head" style="margin-bottom: 12px;">
         <div class="section-title">
-          <span class="step-badge step-indigo">5</span>
+          <span class="step-badge step-indigo">2</span>
           <div>
             <h2>互動多進位 ↔ 多項式矩陣表與輔助工具</h2>
             <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
