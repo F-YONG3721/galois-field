@@ -3121,9 +3121,18 @@
         const genBanner = $('generatorBanner');
 
         if (!pValid) {
+          // 非質數不構成有限體；矩陣區改以 Z/pZ（n=1）模環顯示加法與乘法表。
+          if (Number.isInteger(p) && p >= 2 && State.n !== 1) {
+            State.n = 1;
+            $('inputN').value = '1';
+          }
           paramStatus.className = 'info-box err';
-          paramStatus.innerHTML = `<strong>錯誤：</strong><span class="mono">p = ${p}</span> 不是質數，請輸入質數（例如 2, 3, 5, 7, 11）。`;
+          paramStatus.innerHTML = `<strong>有限體功能停用：</strong><span class="mono">p = ${p}</span> 不是質數；矩陣區可改以 <span class="mono">Z/${p}Z</span> 模環模式查看加法與乘法表。`;
           genBanner.className = 'info-box hidden';
+          $('headerBadges').innerHTML = `
+            <span class="badge badge-amber">Z/${p}Z 模環</span>
+            <span class="badge">元素總數 = ${p >= 2 ? p : 0}</span>
+          `;
           State.mValid = false;
           State.expLog = null;
           State.tableData = [];
@@ -4526,6 +4535,9 @@
 
       function getFieldOpResultInt(rVal, cVal, opType) {
         const { p, n, mPoly } = State;
+        if (!GFMath.isPrime(p) && n === 1) {
+          return GFMath.mod(opType === 'add' ? rVal + cVal : rVal * cVal, p);
+        }
         const aPoly = GFMath.intToPoly(rVal, p, n);
         const bPoly = GFMath.intToPoly(cVal, p, n);
         let resPoly;
@@ -4602,25 +4614,33 @@
 
       function renderMatrixSection() {
         const { p, n, mValid, matrixMode, mtxDisplayMode, tableData, expLog } = State;
+        const ringMode = !GFMath.isPrime(p) && Number.isInteger(p) && p >= 2 && n === 1;
         const maxN = GFMath.isPrime(p) ? getMaxNForP(p) : 8;
-        const sizeBig = GFMath.isPrime(p) && n >= 1 && n <= maxN ? BigInt(p) ** BigInt(n) : 0n;
+        const sizeBig = ringMode
+          ? BigInt(p)
+          : GFMath.isPrime(p) && n >= 1 && n <= maxN ? BigInt(p) ** BigInt(n) : 0n;
         const notice = $('matrixTooLargeNotice');
         const area = $('matrixInteractiveArea');
         const modeBadge = $('matrixModeBadge');
         const dispLabel = getMatrixDisplayLabel(mtxDisplayMode);
+        const matrixData = ringMode
+          ? Array.from({ length: p }, (_, value) => ({ value, poly: [value], hex: Format.hexStr(value, 1) }))
+          : tableData;
 
-        modeBadge.innerHTML = `GF(${p}<sup>${n}</sup>) · 顯示：${dispLabel}`;
+        modeBadge.innerHTML = ringMode
+          ? `Z/${p}Z 模環 · 顯示：${dispLabel}`
+          : `GF(${p}<sup>${n}</sup>) · 顯示：${dispLabel}`;
         $('mtxOptBaseP').textContent = `${p} 進位係數 (Base ${p})`;
         $('mtxDisplayMode').value = mtxDisplayMode;
 
-        if (!mValid) {
+        if (!mValid && !ringMode) {
           notice.classList.remove('hidden');
           notice.textContent = '請先在區塊 1 設定合法的有限體參數與不可約多項式，即可檢視互動多進位 ↔ 多項式矩陣。';
           area.classList.add('hidden');
           return;
         }
 
-        if (sizeBig > BigInt(MAX_TABLE_SIZE) || tableData.length === 0) {
+        if (sizeBig > BigInt(MAX_TABLE_SIZE) || matrixData.length === 0) {
           notice.classList.remove('hidden');
           notice.innerHTML = `目前有限體階數 <strong class="mono">${sizeBig.toString()}</strong> 超過矩陣表上限（${MAX_TABLE_SIZE}），互動矩陣已停用；下方的「係數建構器」與「快速乘冪追蹤器」仍可正常使用！`;
           area.classList.add('hidden');
@@ -4632,6 +4652,14 @@
 
         const size = Number(sizeBig);
         const isOpTable = matrixMode === 'mul' || matrixMode === 'add';
+        if (ringMode && !isOpTable) {
+          notice.classList.remove('hidden');
+          notice.textContent = '非質數模環模式目前提供加法表與乘法表。';
+          area.classList.add('hidden');
+          return;
+        } else {
+          notice.classList.add('hidden');
+        }
 
         // 乘/加法表永遠顯示列區段與欄區段（與「顯示方式」並排）；網格模式則僅隱藏列/欄區段，保留「顯示方式」
         $('matrixRowBlockGroup').classList.toggle('hidden', !isOpTable);
@@ -4660,7 +4688,7 @@
           for (let c = colStart; c < colEnd; c++) {
             const key = `ch-${c}`;
             const revealed = State.matrixRevealed.has(key);
-            const rowObj = tableData[c];
+            const rowObj = matrixData[c];
             const disp = revealed ? Format.polyCompactHTML(rowObj.poly) : getFormattedCellValue(c, rowObj.poly, mtxDisplayMode);
             html += `<th class="mtx-ch mtx-interactive poly-expr${revealed ? ' is-poly' : ''}" data-key="${key}" data-kind="ch" data-col="${c}" data-val="${c}">${disp}</th>`;
           }
@@ -4669,7 +4697,7 @@
           for (let r = rowStart; r < rowEnd; r++) {
             const rhKey = `rh-${r}`;
             const rhRevealed = State.matrixRevealed.has(rhKey);
-            const rObj = tableData[r];
+            const rObj = matrixData[r];
             const rhDisp = rhRevealed ? Format.polyCompactHTML(rObj.poly) : getFormattedCellValue(r, rObj.poly, mtxDisplayMode);
 
             html += `<tr>`;
@@ -4677,7 +4705,7 @@
 
             for (let c = colStart; c < colEnd; c++) {
               const resVal = getFieldOpResultInt(r, c, matrixMode);
-              const resObj = tableData[resVal];
+              const resObj = matrixData[resVal];
               const key = `${matrixMode}-${r}-${c}`;
               const revealed = State.matrixRevealed.has(key);
               const disp = revealed ? Format.polyCompactHTML(resObj.poly) : getFormattedCellValue(resVal, resObj.poly, mtxDisplayMode);
@@ -4696,7 +4724,7 @@
 
           let html = `<div class="mtx-grid-wrap" style="grid-template-columns: repeat(${cols}, minmax(76px, 1fr));">`;
           for (let v = 0; v < size; v++) {
-            const rowObj = tableData[v];
+            const rowObj = matrixData[v];
             const key = `grid-${v}`;
             const revealed = State.matrixRevealed.has(key);
             const disp = revealed ? Format.polyCompactHTML(rowObj.poly) : getFormattedCellValue(v, rowObj.poly, mtxDisplayMode);
